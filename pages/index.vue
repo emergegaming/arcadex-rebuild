@@ -5,3 +5,12 @@
         <nuxt-link to="/games/dos/digger" class="mt-4 py-2 px-4 border border-white rounded-md bg-blue-900 z-20 pointer-events-auto cursor-pointer">PLAY DIGGER</nuxt-link>
     </section>
 </template>
+<script>
+export default {
+    head() {
+        return {
+            title: 'Arcade X'
+        }
+    }
+}
+</script>
