@@ -1,6 +1,6 @@
 <template>
     <div id="screen" ref="screen" class="flex w-full h-screen items-center justify-center bg-black">
-        <div to="/" id="exit" class="absolute top-0 right-0 m-3 z-40 p-1 rounded-full border-4 border-gray-500" @click="exitGame()">
+        <div id="exit" class="absolute top-0 right-0 m-3 z-40 p-1 rounded-full border-4 border-gray-500 cursor-pointer" @click="exitGame()">
             <svg class="text-white w-8 h-8 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
