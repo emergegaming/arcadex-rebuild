@@ -130,9 +130,7 @@ export default {
             this.state = 'exiting'
             this.destroyEventListeners();
             this.exitFullscreen();
-            window.ci = null;
-            let canvas = this.$refs.canvas;
-            canvas.remove();
+            window.ci.exit();
             setTimeout(() => {
                 this.$router.push({path:'/'})
             })
