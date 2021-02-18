@@ -10,7 +10,7 @@
 
 <script>
 
-import {TouchHelper} from "assets/ArcadeXTouchHelper.js";
+import {TouchHelper} from "assets/arcadex/TouchHelper";
 
 export default {
     name: "ButtonControls",
@@ -31,7 +31,7 @@ export default {
     },
     methods: {
         pseudoKeyboardEvent(asciiKey, pressed) {
-            this.$emit('keyEvent', {asciiKey, pressed})
+            this.$emit('keyEvent', {asciiKey:asciiKey, pressed:pressed})
         }
     }
 }

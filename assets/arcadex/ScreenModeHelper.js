@@ -43,8 +43,6 @@ export class ScreenModeHelper {
     }
 
     checkFullScreen() {
-        console.log (this.windowRef.outerHeight)
-        console.log (this.windowRef.screen.height)
         if (this.fullScreenListener) {
             this.fullScreenListener(this.windowRef.outerHeight === this.windowRef.screen.height);
         }
@@ -53,10 +51,7 @@ export class ScreenModeHelper {
         if (this.fullScreenElement.webkitRequestFullscreen) {
             this.fullScreenElement.webkitRequestFullscreen(); // Safari
         } else {
-            this.fullScreenElement.requestFullscreen(); // Other
+            this.fullScreenElement.requestFullscreen();
         }
     }
-
-
-
 }

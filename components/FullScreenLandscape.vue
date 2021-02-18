@@ -19,7 +19,7 @@
 /**
  * This component displays a "please rotate" or "enter full screen" overlay over its content if required.
  */
-import {ScreenModeHelper} from "assets/ArcadeXScreenModeHelper.js";
+import {ScreenModeHelper} from "assets/arcadex/ScreenModeHelper";
 
 export default {
     name: "FullScreenLandscape",

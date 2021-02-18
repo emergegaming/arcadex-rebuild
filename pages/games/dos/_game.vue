@@ -3,33 +3,28 @@
         <div class="flex flex-row w-full h-screen flex-grow">
 
             <!-- Left Column (Directional Control) -->
-            <div class="flex flex-grow flex-col items-center justify-end">
+            <div class="flex flex-grow flex-col items-center justify-center">
                 <DirectionControl @keyEvent="handleKeyEvent($event)" class="w-32 h-32 mb-5">
-                    <div class="bg-blue-500 rounded-full pointer-events-none w-full h-full"></div>
+                    <div class="bg-blue-800 rounded-full pointer-events-none w-full h-full"></div>
                 </DirectionControl>
             </div>
 
             <!-- Middle Column (Canvas) -->
-            <div class="flex bg-blue-500 items-center justify-center">
-                <!--
-                <DosGame4 class="ax-canvas"/>
-                -->
+            <div class="flex items-center justify-center">
+                <DosCanvas class="ax-canvas" :zipPath="selectedGame.path" :exec="selectedGame.exec" :cycles="selectedGame.cycles" :opts="selectedGame.opts" :keyEvent="keyEvent"/>
             </div>
 
             <!-- Right Column (Buttons) -->
-            <div class="flex flex-col flex-grow items-center justify-end">
-                <ButtonControl :ascii-code="97" @keyEvent="handleKeyEvent($event)" class="w-20 h-20 mb-5">
-                    <div class="bg-red-500 rounded-full pointer-events-none w-full h-full"></div>
+            <div class="flex flex-col flex-grow items-center justify-center">
+                <ButtonControl :ascii-code="32" @keyEvent="handleKeyEvent($event)" class="w-16 h-16">
+                    <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full"></div>
                 </ButtonControl>
-                <ButtonControl :ascii-code="122" @keyEvent="handleKeyEvent($event)" class="w-20 h-20 mb-5">
-                    <div class="bg-red-500 rounded-full pointer-events-none w-full h-full"></div>
+                <ButtonControl :ascii-code="112" @keyEvent="handleKeyEvent($event)" class="w-16 h-16 mt-5 mb-5">
+                    <div class="bg-red-800 rounded-full pointer-events-none w-full h-full"></div>
                 </ButtonControl>
             </div>
         </div>
 
-        <!--
-        <dos-game-3 :path="selectedGame.path" :exec="selectedGame.exec" :cycles="selectedGame.cycles" :opts="selectedGame.opts"/>
-        -->
     </full-screen-landscape>
 </template>
 
@@ -37,21 +32,23 @@
 
 import FullScreenLandscape from "@/components/FullScreenLandscape.vue";
 import DirectionControls from "@/components/DirectionControl.vue";
+import DosCanvas from "@/components/DosCanvas.vue";
 
 export default {
     name: "digger",
-    components: {FullScreenLandscape, DirectionControls},
+    components: {FullScreenLandscape, DirectionControls, DosCanvas},
     data() {
         return {
             games: {
                 "digger": {         title:'Digger',         path: '/games/dos/digger.zip',        exec: 'DIGGER.COM',                   opts: '-c',     cycles:400},
                 "bubble-bobble": {  title:'Bubble Bobble',  path: '/games/dos/bubble_bobble.zip', exec: './Bubble_Bobble/BUBBLE.EXE',   opts: '',       cycles:750}
-            }
+            },
+            keyEvent: undefined
         }
     },
     methods: {
         handleKeyEvent(keyEvent) {
-            console.log (keyEvent);
+            this.keyEvent = {asciiKey: keyEvent.asciiKey, pressed:keyEvent.pressed}
         }
     },
     computed: {
@@ -72,8 +69,8 @@ export default {
 
 <style scoped>
     .ax-canvas {
-        background-color: #ff0000;
-        height: 80vh;
-        width: 128vh;
+        background-color: #000000;
+        height: 85vh;
+        width: 136vh;
     }
 </style>
