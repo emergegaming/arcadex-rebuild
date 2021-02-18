@@ -13,8 +13,7 @@ export default {
         exec:{required: true},
         opts:{required: false, default: null},
         cycles: {required: false, default: 700},
-        keyEvent: {required: false}
-
+        keyEventQueue: {required: false, default:[]}
     },
     mounted() {
         let emulator = new DosEmulator('/js/vendor/dosbox/wdosbox.js', this.$refs.canvas);
@@ -29,19 +28,14 @@ export default {
         }
     },
     watch: {
-        'keyEvent': {
-            deep: true,
-            handler(event) {
-                console.log(event.asciiKey + ":" + event.pressed)
+        keyEventQueue: function(keyEvents) {
+            while (keyEvents.length > 0) {
                 if (window.ci) {
-                    window.ci.simulateKeyEvent(event.asciiKey, event.pressed)
+                    window.ci.simulateKeyEvent(keyEvents[0].asciiKey, keyEvents[0].pressed)
                 }
+                keyEvents.shift();
             }
         }
     }
 }
 </script>
-
-<style scoped>
-
-</style>

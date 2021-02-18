@@ -44,7 +44,7 @@ export class ScreenModeHelper {
 
     checkFullScreen() {
         if (this.fullScreenListener) {
-            this.fullScreenListener(this.windowRef.outerHeight === this.windowRef.screen.height);
+            this.fullScreenListener(this.windowRef.outerHeight === this.windowRef.screen.height || this.windowRef.document.fullscreenElement);
         }
     }
     setFullScreen() {
@@ -52,6 +52,14 @@ export class ScreenModeHelper {
             this.fullScreenElement.webkitRequestFullscreen(); // Safari
         } else {
             this.fullScreenElement.requestFullscreen();
+        }
+    }
+
+    exitFullScreen() {
+        if (this.windowRef.document.webkitExitFullscreen) {
+            this.windowRef.document.webkitExitFullscreen(); // Safari
+        } else {
+            this.windowRef.document.exitFullscreen();
         }
     }
 }

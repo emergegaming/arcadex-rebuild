@@ -15,7 +15,6 @@ export class DosEmulator {
     }
 
     setReadyListener(readyListener) {
-        console.log("Setting ready listener")
         this.readyListener = readyListener;
     }
 
