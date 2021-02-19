@@ -26,7 +26,6 @@ export default {
     },
     methods: {
         pseudoKeyboardEvent(key, pressed) {
-            console.log ("touch:" + key + ":" + pressed)
             this.$emit('keyEvent', {asciiKey:key, pressed:pressed})
         }
     }

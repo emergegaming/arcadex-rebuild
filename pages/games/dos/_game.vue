@@ -13,7 +13,7 @@
 
             <!-- Middle Column (Canvas) -->
             <div class="flex items-center justify-center">
-                <DosCanvas class="ax-canvas" :zipPath="selectedGame.path" :exec="selectedGame.exec" :cycles="selectedGame.cycles" :opts="selectedGame.opts" :keyEventQueue="keyEventQueue"/>
+                <DosCanvas class="ax-canvas" :zipPath="selectedGame.path" :exec="selectedGame.exec" :cycles="selectedGame.cycles" :opts="selectedGame.opts" :keyEventQueue="keyEventQueue" :playing="playing" @started="start()"/>
             </div>
 
             <!-- Right Column (Buttons) -->
@@ -53,6 +53,7 @@ export default {
             keyEventQueue: [],
             requireLandscape: true,
             requireFullScreen: true,
+            playing: false,
         }
     },
     methods: {
@@ -60,12 +61,10 @@ export default {
             this.keyEventQueue.push(keyEvent)
         },
         exit() {
-            console.log("Exiting")
-            window.ci.exit();
-            this.requireFullScreen = false;
-            this.requireLandscape = false;
-            new ScreenModeHelper(window).exitFullScreen();
-            this.$router.push('/');
+            this.playing = false;
+        },
+        start() {
+            this.playing = true;
         }
     },
     computed: {
