@@ -1,9 +1,9 @@
 <template>
     <full-screen-landscape :force-full-screen="requireFullScreen" :force-landscape="requireLandscape">
-        <div class="flex flex-row w-full h-screen flex-grow">
+        <div class="flex flex-row w-full h-screen flex-grow items-center justify-center">
 
             <!-- Left Column (Directional Control) -->
-            <div class="flex flex-grow flex-col items-center justify-center">
+            <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
                 <DirectionControl @keyEvent="handleKeyEvent($event)" class="w-32 h-32 mb-5">
                     <div class="bg-blue-800 rounded-full pointer-events-none w-full h-full flex justify-center items-center">
                         <div class="bg-blue-700 rounded-full pointer-events-none w-10 h-10"></div>
@@ -17,7 +17,7 @@
             </div>
 
             <!-- Right Column (Buttons) -->
-            <div class="flex flex-col flex-grow items-center justify-center">
+            <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
                 <div @click="exit" class="w-16 h-16 mt-5 mb-5">
                     <div class="bg-gray-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center">Exit</div>
                 </div>
@@ -39,6 +39,7 @@ import FullScreenLandscape from "@/components/FullScreenLandscape.vue";
 import DirectionControls from "@/components/DirectionControl.vue";
 import DosCanvas from "@/components/DosCanvas.vue";
 import {ScreenModeHelper} from "assets/arcadex/ScreenModeHelper.js";
+import {isTouch} from "assets/arcadex/TouchHelper.js";
 
 export default {
     name: "digger",
@@ -72,6 +73,9 @@ export default {
         },
         'selectedGame' : function () {
             return this.games[this.game];
+        },
+        'isTouch' : function () {
+            return isTouch();
         }
     },
     head() {
