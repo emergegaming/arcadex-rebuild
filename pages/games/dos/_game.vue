@@ -18,7 +18,7 @@
 
             <!-- Right Column (Buttons) -->
             <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-                <div @click="exit" class="w-16 h-16 mt-5 mb-5">
+                <div @click="exit()" class="w-16 h-16 mt-5 mb-5">
                     <div class="bg-gray-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center">Exit</div>
                 </div>
                 <ButtonControl :ascii-code="32" @keyEvent="handleKeyEvent($event)" class="w-16 h-16">
@@ -60,6 +60,7 @@ export default {
             this.keyEventQueue.push(keyEvent)
         },
         exit() {
+            console.log("Exiting")
             window.ci.exit();
             this.requireFullScreen = false;
             this.requireLandscape = false;

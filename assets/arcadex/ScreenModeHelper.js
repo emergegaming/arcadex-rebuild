@@ -59,7 +59,7 @@ export class ScreenModeHelper {
         if (this.windowRef.document.webkitExitFullscreen) {
             this.windowRef.document.webkitExitFullscreen(); // Safari
         } else {
-            this.windowRef.document.exitFullscreen();
+            if (this.windowRef.document.fullscreenElement) this.windowRef.document.exitFullscreen();
         }
     }
 }
