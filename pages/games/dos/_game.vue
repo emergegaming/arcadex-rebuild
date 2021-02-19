@@ -1,5 +1,5 @@
 <template>
-    <full-screen-landscape :force-full-screen="requireFullScreen" :force-landscape="requireLandscape">
+    <full-screen-landscape :force-full-screen="requireFullScreen" :force-landscape="requireLandscape" @exitFullScreen="exit()">
         <div class="flex flex-row w-full h-screen flex-grow items-center justify-center">
 
             <!-- Left Column (Directional Control) -->
@@ -61,6 +61,7 @@ export default {
             this.keyEventQueue.push(keyEvent)
         },
         exit() {
+            console.log ("exiting")
             this.playing = false;
         },
         start() {

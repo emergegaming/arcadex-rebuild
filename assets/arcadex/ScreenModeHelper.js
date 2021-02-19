@@ -43,6 +43,7 @@ export class ScreenModeHelper {
     }
 
     checkFullScreen() {
+        console.log ("CHECK")
         if (this.fullScreenListener) {
             this.fullScreenListener(this.windowRef.outerHeight === this.windowRef.screen.height || this.windowRef.document.fullscreenElement);
         }

@@ -54,6 +54,9 @@ export default {
         },
         fullScreenChanged(fullscreen) {
             this.fullscreen = fullscreen;
+            if (!fullscreen) {
+                this.$emit('exitFullScreen')
+            }
         },
         goFullScreen() {
             this.screenHelper.setFullScreen();
