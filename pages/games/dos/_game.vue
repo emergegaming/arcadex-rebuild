@@ -144,4 +144,9 @@ export default {
         height: 85vh;
         width: 136vh;
     }
+
+    *:not(input):not(textarea) {
+      -webkit-user-select: none; /* disable selection/Copy of UIWebView */
+      -webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
+    }
 </style>
