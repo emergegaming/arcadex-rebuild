@@ -38,6 +38,7 @@ export default {
         checkForKeyPress: function() {
             while (this.keyEventQueue.length > 0) {
                 if (window.ci) {
+                    console.log (this.keyEventQueue[0].asciiKey, this.keyEventQueue[0].pressed)
                     window.ci.simulateKeyEvent(this.keyEventQueue[0].asciiKey, this.keyEventQueue[0].pressed)
                 }
                 this.keyEventQueue.shift();

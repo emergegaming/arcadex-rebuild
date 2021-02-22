@@ -1,9 +1,8 @@
 <template>
     <div id="touchpad" ref="touchpad"
-         @touchstart="touch.directionTouched($event)"
-         @touchmove="touch.directionTouched($event)"
-         @touchend="touch.directionTouched($event)">
-
+         @touchstart="touch.elementTouched($event)"
+         @touchmove="touch.elementTouched($event)"
+         @touchend="touch.elementTouched($event)">
         <slot/>
     </div>
 </template>
@@ -15,6 +14,12 @@ import {TouchHelper} from "assets/arcadex/TouchHelper";
 export default {
 
     name: "DirectionControl",
+    props: {
+        id: {
+            type: String,
+            required: true
+        }
+    },
     data() {
         return {
             touch:undefined

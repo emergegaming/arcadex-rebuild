@@ -17,6 +17,7 @@ export class ScreenModeHelper {
 
         try {
             windowRef.removeEventListener('resize', this.checkNow)
+            console.log ('Removing event listener')
         } finally {
             windowRef.addEventListener('resize', this.checkNow.bind(this))
         }
@@ -60,6 +61,7 @@ export class ScreenModeHelper {
         if (this.windowRef.document.webkitExitFullscreen) {
             this.windowRef.document.webkitExitFullscreen(); // Safari
         } else {
+            console.log ("Attempting to exit full screen");
             if (this.windowRef.document.fullscreenElement) this.windowRef.document.exitFullscreen();
         }
     }

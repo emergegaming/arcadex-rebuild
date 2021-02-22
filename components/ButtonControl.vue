@@ -1,8 +1,8 @@
 <template>
-    <div id="button" ref="button"
-         @touchstart="touch.buttonTouched($event)"
-         @touchmove="touch.buttonTouched($event)"
-         @touchend="touch.buttonTouched($event)">
+    <div :id="id" ref="button"
+         @touchstart="touch.elementTouched($event)"
+         @touchmove="touch.elementTouched($event)"
+         @touchend="touch.elementTouched($event)">
 
         <slot/>
     </div>
@@ -17,6 +17,10 @@ export default {
     props: {
         asciiCode: {
             type: Number,
+            required: true
+        },
+        id: {
+            type: String,
             required: true
         }
     },

@@ -31,47 +31,55 @@ export class TouchHelper {
      * Tells this class that a control surface (usually a square DIV was touched)
      * @param event the original event that happened
      */
-    directionTouched(event) {
-        if (event.touches && event.touches[0]) {
-            let x = event.touches[0].clientX;
-            let y = event.touches[0].clientY;
-            let pctX = Math.round((x - this.left) / this.width * 100) - 50;
-            let pctY = Math.round((y - this.top) / this.height * 100) - 50;
-            if (pctX < 0 && Math.abs(pctX) > Math.abs(pctY)) this.direction = 'left'; else
-            if (pctX > 0 && Math.abs(pctX) > Math.abs(pctY)) this.direction = 'right'; else
-            if (pctY < 0 && Math.abs(pctX) < Math.abs(pctY)) this.direction = 'up'; else
-            if (pctY > 0 && Math.abs(pctX) < Math.abs(pctY)) this.direction = 'down'; else
-                this.direction = null;
-        } else {
-            this.direction = null;
-        }
+    elementTouched(event) {
 
-        if (this.keyEventTarget && this.direction !== this.lastDirection) {
-            if (this.lastDirection) {
-                this.keyEventTarget(this.directionalKeyMapping[this.lastDirection], false);
-            }
-            if (this.direction) {
-                this.keyEventTarget(this.directionalKeyMapping[this.direction], true);
+        if (event.touches && event.touches[0]) {
+            for (let i = 0; i < event.touches.length; i++) {
+                let elem = document.elementFromPoint(event.touches[i].clientX, event.touches[i].clientX);
+                console.log (elem)
+                //console.log (id);
             }
         }
-        this.lastDirection = this.direction;
 
+    //         let x = event.touches[0].clientX;
+    //         let y = event.touches[0].clientY;
+    //         let pctX = Math.round((x - this.left) / this.width * 100) - 50;
+    //         let pctY = Math.round((y - this.top) / this.height * 100) - 50;
+    //         if (pctX < 0 && Math.abs(pctX) > Math.abs(pctY)) this.direction = 'left'; else
+    //         if (pctX > 0 && Math.abs(pctX) > Math.abs(pctY)) this.direction = 'right'; else
+    //         if (pctY < 0 && Math.abs(pctX) < Math.abs(pctY)) this.direction = 'up'; else
+    //         if (pctY > 0 && Math.abs(pctX) < Math.abs(pctY)) this.direction = 'down'; else
+    //             this.direction = null;
+    //     } else {
+    //         this.direction = null;
+    //     }
+    //
+    //     if (this.keyEventTarget && this.direction !== this.lastDirection) {
+    //         if (this.lastDirection) {
+    //             this.keyEventTarget(this.directionalKeyMapping[this.lastDirection], false);
+    //         }
+    //         if (this.direction) {
+    //             this.keyEventTarget(this.directionalKeyMapping[this.direction], true);
+    //         }
+    //     }
+    //     this.lastDirection = this.direction;
+    //
     }
-
-    buttonTouched(event) {
-        if (event.touches && event.touches[0]) {
-            this.button = 'down'
-        } else {
-            this.button = 'up'
-        }
-
-        if (this.keyEventTarget && this.button !== this.lastButton) {
-            if (this.lastButton && this.lastButton === 'down') this.keyEventTarget(this.asciiValue, false);
-            if (this.button === 'down') this.keyEventTarget(this.asciiValue, true);
-        }
-
-        this.lastButton = this.button;
-    }
+    //
+    // buttonTouched(event) {
+    //     if (event.touches && event.touches[0]) {
+    //         this.button = 'down'
+    //     } else {
+    //         this.button = 'up'
+    //     }
+    //
+    //     if (this.keyEventTarget && this.button !== this.lastButton) {
+    //         if (this.lastButton && this.lastButton === 'down') this.keyEventTarget(this.asciiValue, false);
+    //         if (this.button === 'down') this.keyEventTarget(this.asciiValue, true);
+    //     }
+    //
+    //     this.lastButton = this.button;
+    // }
 
     simulateKeyboardEvents(target, asciiValue) {
         this.keyEventTarget = target;
