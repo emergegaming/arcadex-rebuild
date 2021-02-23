@@ -22,10 +22,10 @@
                 <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Exit</div>
             </div>
             <div id="ctlButton3" class="w-16 h-16 mb-5 mt-10">
-                <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full flex items-center justify-center pointer-events-none">Space</div>
+                <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full flex items-center justify-center">Space</div>
             </div>
             <div id="ctlButton4" class="w-16 h-16">
-                <div class="bg-red-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center pointer-events-none">Fire</div>
+                <div class="bg-red-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center">Fire</div>
             </div>
         </div>
     </div>
@@ -39,11 +39,15 @@ export default {
     name: "game.vue",
     data() {
         return {
+            game : {
+                directions: 4
+            },
             directionStart: {
                 x: null,
                 y: null,
                 identifier: null
             },
+            lastDirection: [],
             buttonsPressed: [],
         }
     },
@@ -71,7 +75,7 @@ export default {
                         this.directionStart.identifier = starting.identifier;
                     } else {
                         let id = document.elementFromPoint(starting.clientX, starting.clientY).getAttribute('id');
-                        if (id) {
+                        if (id && id.startsWith("ctl")) {
                             this.simulateKeyPress(id, true);
                             this.buttonsPressed.push({identifier:starting.identifier, id:id, x:starting.clientX, y:starting.clientY});
                         }
@@ -79,10 +83,14 @@ export default {
                 });
             } else if (event.type === 'touchend') {
                 event.changedTouches.forEach((ending) => {
-                    if (ending.clientX < 200) {
+                    if (ending.identifier === this.directionStart.identifier) {
                         this.directionStart.x = null;
                         this.directionStart.y = null;
                         this.directionStart.identifier = null;
+                        if (this.lastDirection.length > 0) {
+                            console.log ("Direction Touch Ended for " + this.lastDirection)
+                        }
+                        this.lastDirection = [];
                     } else {
                         let released = this.buttonsPressed.find(item => item.identifier === ending.identifier)
                         if (released) {
@@ -94,12 +102,48 @@ export default {
             } else if (event.type === 'touchmove') {
                 event.changedTouches.forEach((moving) => {
                     if (moving.clientX < 200) {
+                        let control = []
                         let dx = moving.clientX - this.directionStart.x;
                         let dy = moving.clientY - this.directionStart.y;
                         let r = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
                         let angle = this.radToDeg(Math.asin(dy/r)) + 90
                         if (dx < 0) angle = (180 - angle) + 180
-                        console.log (angle)
+
+                        if (this.game.directions === 4) {
+                            if (angle >= 315 || angle < 45) control=['up']
+                            else if (angle >= 45 && angle < 135) control=['right']
+                            else if (angle >= 135 && angle < 225) control = ['down']
+                            else if (angle >= 225 && angle < 315) control = ['left']
+                            else {
+                                log.error ('unknown angle ' + angle);
+                            }
+                        } else if (this.game.directions === 8) {
+                            //let dirs = [338, 23, 68, 113, 158, 203, 248, 293, 338]
+                            if (angle >= 338 || angle < 23) control = ['up']
+                            else if (angle >= 23 && angle < 68) control = ['up', 'right']
+                            else if (angle >= 68 && angle < 113) control = ['right']
+                            else if (angle >= 113 && angle < 158) control = ['down', 'right']
+                            else if (angle >= 158 && angle < 203) control = ['down']
+                            else if (angle >= 203 && angle < 248) control = ['down', 'left']
+                            else if (angle >= 248 && angle < 293) control = ['left']
+                            else if (angle >= 293 && angle < 338) control = ['up', 'left']
+                            else {
+                                console.error ('unknown angle '+ angle);
+                            }
+                        } else {
+                            console.error('directions need to be 4 or 8')
+                        }
+
+                        if (control.join(',') !== this.lastDirection.join(',')) {
+                            if (this.lastDirection.length !== 0) {
+                                console.log ("Releasing last direction " + this.lastDirection.join(","));
+                            }
+                            console.log("Initiating direction " + control.join(","))
+
+                        }
+
+                        this.lastDirection = control;
+
                     }
                 });
             }
