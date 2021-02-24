@@ -40,7 +40,7 @@ export default {
     data() {
         return {
             game : {
-                directions: 4
+                directions: 8
             },
             directionStart: {
                 x: null,
@@ -88,7 +88,8 @@ export default {
                         this.directionStart.y = null;
                         this.directionStart.identifier = null;
                         if (this.lastDirection.length > 0) {
-                            console.log ("Direction Touch Ended for " + this.lastDirection)
+                            this.processDirectionChange(this.lastDirection, [])
+//                            console.log ("Direction Touch Ended for " + this.lastDirection)
                         }
                         this.lastDirection = [];
                     } else {
@@ -134,13 +135,14 @@ export default {
                             console.error('directions need to be 4 or 8')
                         }
 
-                        if (control.join(',') !== this.lastDirection.join(',')) {
-                            if (this.lastDirection.length !== 0) {
-                                console.log ("Releasing last direction " + this.lastDirection.join(","));
-                            }
-                            console.log("Initiating direction " + control.join(","))
+                        this.processDirectionChange(this.lastDirection, control)
 
-                        }
+                        // if (control.join(',') !== this.lastDirection.join(',')) {
+                        //     if (this.lastDirection.length !== 0) {
+                        //         console.log ("Releasing last direction " + this.lastDirection.join(","));
+                        //     }
+                        //     console.log("Initiating direction " + control.join(","))
+                        // }
 
                         this.lastDirection = control;
 
@@ -153,6 +155,13 @@ export default {
         },
         radToDeg(rad) {
             return Math.round(rad * 180 / Math.PI);
+        },
+        processDirectionChange(was, is) {
+            let turnOff = was.filter(w => is.indexOf(w) === -1)
+            let turnOn = is.filter(i => was.indexOf(i) === -1)
+            if (turnOff.length > 0 ) console.log ("Turning off " + turnOff);
+            if (turnOn.length > 0 ) console.log ("Turning on " + turnOn);
+
         },
         runDosProgram (zipPath, exec, opts, cycles) {
             let self = this;
