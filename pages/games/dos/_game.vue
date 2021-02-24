@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row w-full h-screen flex-grow items-center justify-center">
+    <div ref="gameScreen" class="flex flex-row w-full h-screen flex-grow items-center justify-center">
 
         <!-- Left Column (Directional Control) -->
         <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
@@ -21,11 +21,11 @@
             <div id="ctlButtonExit" class="w-16 h-8 mb-5">
                 <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Exit</div>
             </div>
-            <div id="ctlButton3" class="w-16 h-16 mb-5 mt-10">
-                <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full flex items-center justify-center">Space</div>
+            <div id="ctlButtonB" class="w-16 h-16 mb-5 mt-10" v-if="game.keys.ctlButtonB">
+                <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full flex items-center justify-center">{{game.keys.ctlButtonB.label}}</div>
             </div>
-            <div id="ctlButton4" class="w-16 h-16">
-                <div class="bg-red-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center">Fire</div>
+            <div id="ctlButtonA" class="w-16 h-16" v-if="game.keys.ctlButtonA">
+                <div class="bg-red-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center">{{game.keys.ctlButtonA.label}}</div>
             </div>
         </div>
     </div>
@@ -39,9 +39,6 @@ export default {
     name: "game.vue",
     data() {
         return {
-            game : {
-                directions: 8
-            },
             directionStart: {
                 x: null,
                 y: null,
@@ -52,11 +49,10 @@ export default {
         }
     },
     mounted() {
-        this.setupEventListeners();
+        this.runDosProgram(this.game.path, this.game.commands, this.game.cycles)
     },
     methods: {
         setupEventListeners() {
-
             document.removeEventListener('touchstart', this.touchListener, false);
             document.removeEventListener('touchend', this.touchListener, false);
             document.removeEventListener('touchmove', this.touchListener, false);
@@ -89,7 +85,6 @@ export default {
                         this.directionStart.identifier = null;
                         if (this.lastDirection.length > 0) {
                             this.processDirectionChange(this.lastDirection, [])
-//                            console.log ("Direction Touch Ended for " + this.lastDirection)
                         }
                         this.lastDirection = [];
                     } else {
@@ -137,14 +132,6 @@ export default {
                         }
 
                         this.processDirectionChange(this.lastDirection, control)
-
-                        // if (control.join(',') !== this.lastDirection.join(',')) {
-                        //     if (this.lastDirection.length !== 0) {
-                        //         console.log ("Releasing last direction " + this.lastDirection.join(","));
-                        //     }
-                        //     console.log("Initiating direction " + control.join(","))
-                        // }
-
                         this.lastDirection = control;
 
                     }
@@ -152,7 +139,31 @@ export default {
             }
         },
         simulateKeyPress(button, pressed) {
-            console.log (button, pressed);
+            console.log (button, pressed)
+            if (button === 'ctlButtonFull') {
+                if (!pressed) {
+                    this.fullscreenPressed()
+                    console.log('Full Screen Button Pressed');
+                }
+            } else if (button === 'ctlButtonExit') {
+                console.log('Exit Button Pressed');
+                this.exitGame();
+            }
+            else {
+                //console.log (button, pressed, this.game.keyMapping[button]);
+                window.ci.simulateKeyEvent(this.game.keys[button].ascii, pressed)
+            }
+        },
+        exitGame() {
+            window.ci.exit();
+            this.$router.push('/')
+        },
+        fullscreenPressed() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen()
+            } else {
+                this.$refs.gameScreen.requestFullscreen()
+            }
         },
         radToDeg(rad) {
             return Math.round(rad * 180 / Math.PI);
@@ -160,22 +171,28 @@ export default {
         processDirectionChange(was, is) {
             let turnOff = was.filter(w => is.indexOf(w) === -1)
             let turnOn = is.filter(i => was.indexOf(i) === -1)
-            if (turnOff.length > 0 ) console.log ("Turning off " + turnOff);
-            if (turnOn.length > 0 ) console.log ("Turning on " + turnOn);
-
+            turnOff.forEach((item) => {
+                this.simulateKeyPress(item, false);
+                window.navigator.vibrate(200);
+            });
+            turnOn.forEach((item) => this.simulateKeyPress(item, true));
         },
-        runDosProgram (zipPath, exec, opts, cycles) {
+        dosReady() {
+            this.setupEventListeners();
+        },
+        runDosProgram (zipPath, commands, cycles) {
+            console.log (zipPath, commands, cycles)
             let self = this;
-            Dos(this.canvas, {
-                wdosboxUrl: this.dosBoxUrl,
+            Dos(this.$refs.axCanvas, {
+                wdosboxUrl: '/js/vendor/dosbox/wdosbox.js',
                 cycles: cycles
             }).ready(function (fs, main) {
                 fs.extract(zipPath).then(
-                    () => main([opts, exec]).then(
+                    () => main(commands).then(
                         (ci) => {
-                            if (self.readyListener) {
-                                self.readyListener(ci)
-                            }
+                            window.Module = ci.dos;
+                            window.ci = ci;
+                            self.dosReady();
                         }
                     )
                 )
@@ -187,6 +204,9 @@ export default {
             return (('ontouchstart' in window) ||
                 (navigator.maxTouchPoints > 0) ||
                 (navigator.msMaxTouchPoints > 0));
+        },
+        game: function() {
+            return games[this.$route.params.game]
         }
     }
 }
