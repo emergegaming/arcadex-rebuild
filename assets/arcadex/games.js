@@ -1,5 +1,6 @@
 export const games = {
-    "digger": { // Working 
+    "digger": {
+        // Working nicely
         title:'Digger',
         path: '/games/dos/digger.zip',
         commands: ['-c', 'DIGGER.COM'],
@@ -15,6 +16,7 @@ export const games = {
         }
     },
     "pac-man": {
+        // Working nicely
         title:'Pac Man',
         path: '/games/dos/PACEM11.zip',
         commands: ['-c', 'PACEM.EXE'],
@@ -30,9 +32,7 @@ export const games = {
     },
 
     "dangerous-dave": {
-        // Requires selection on the first screen (could automate)
-        // Requires mapping of keys (x: speed (,):up (.):invert (/):down (b):bomb (h):home
-        // Requires auto game restart
+        // Working nicely
         title:'Dangerous Dave',
         path: '/games/dos/dangerousdave.zip',
         commands: ['cd DANGER~1', 'DAVE.EXE'],
@@ -83,6 +83,5 @@ export const games = {
             'ctlButtonA':112,
             'ctlButtonB':32
         }
-
     }
 }
