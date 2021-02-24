@@ -6,10 +6,10 @@ export const games = {
         cycles:400,
         directions: 4,
         keys: {
-            'up':38,
-            'down':40,
-            'left':37,
-            'right':39,
+            'up':{ascii:38},
+            'down':{ascii:40},
+            'left':{ascii:37},
+            'right':{ascii:39},
             'ctlButtonA':{ascii:112, label:'Fire'},
             'ctlButtonB':{ascii:32, label:'Start'}
         }
