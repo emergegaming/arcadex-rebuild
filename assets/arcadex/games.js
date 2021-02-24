@@ -1,5 +1,5 @@
 export const games = {
-    "digger": {
+    "digger": { // Working 
         title:'Digger',
         path: '/games/dos/digger.zip',
         commands: ['-c', 'DIGGER.COM'],
