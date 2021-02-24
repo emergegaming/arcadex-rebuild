@@ -106,6 +106,7 @@ export default {
                         let control = []
                         let dx = moving.clientX - this.directionStart.x;
                         let dy = moving.clientY - this.directionStart.y;
+                        if (dx === 0 && dy === 0) return
                         let r = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
                         let angle = this.radToDeg(Math.asin(dy/r)) + 90
                         if (dx < 0) angle = (180 - angle) + 180
@@ -119,7 +120,7 @@ export default {
                                 log.error ('unknown angle ' + angle);
                             }
                         } else if (this.game.directions === 8) {
-                            //let dirs = [338, 23, 68, 113, 158, 203, 248, 293, 338]
+
                             if (angle >= 338 || angle < 23) control = ['up']
                             else if (angle >= 23 && angle < 68) control = ['up', 'right']
                             else if (angle >= 68 && angle < 113) control = ['right']
