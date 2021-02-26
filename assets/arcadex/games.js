@@ -44,7 +44,7 @@ export const games = {
             'left':{ascii:37},
             'right':{ascii:39},
             'ctlButtonA':{ascii:17, label:'Fire'},
-            'ctlButtonB':{ascii:13, label:'Enter'},
+            'ctlButtonB':{ascii:18, label:'Jet'},
         }
     },
 
