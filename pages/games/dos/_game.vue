@@ -1,21 +1,22 @@
 <template>
-    <div ref="gameScreen" class="flex flex-row w-full h-screen flex-grow items-center justify-center">
-
+    <div ref="gameScreen" id="gameScreen" class="flex flex-row w-full h-full flex-grow items-center justify-center">
+        
         <!-- Left Column (Directional Control) -->
         <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
-            <div class="w-32 h-32 bg-blue-800 rounded-full pointer-events-none flex justify-center items-center">
-                <div class="bg-blue-700 rounded-full pointer-events-none w-10 h-10"></div>
+            <div class="w-32 h-32 bg-red-800 rounded-full pointer-events-none flex justify-center items-center">
+                <div class="bg-red-600 rounded-full pointer-events-none w-16 h-16"></div>
             </div>
         </div>
 
         <!-- Middle Column (Canvas) -->
-        <div class="flex items-center justify-center">
+        <div id="axMiddleColumn">
+        <!-- <div class="flex items-center justify-center"> -->
             <canvas id="axCanvas" ref="axCanvas"/>
         </div>
 
         <!-- Right Column (Buttons) -->
-        <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-            <div id="ctlButtonFull" class="w-16 h-8 mb-5">
+        <div id="axRightColumn" class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
+            <div id="ctlButtonFull" class="w-16 h-8 mb-5" v-if="isFullscreenAvailable">
                 <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Full</div>
             </div>
             <div id="ctlButtonExit" class="w-16 h-8 mb-5">
@@ -49,7 +50,19 @@ export default {
         }
     },
     mounted() {
-        this.runDosProgram(this.game.path, this.game.commands, this.game.cycles)
+        this.runDosProgram(this.game.path, this.game.commands, this.game.cycles);
+
+        // Prevent swiping to navigate browser on iOS only
+        if (this.isIos) {
+            const element = document.getElementById('gameScreen');
+            element.addEventListener('touchstart', (e) => {
+                // Is not near edge of view, exit
+                if (e.pageX > 10 && e.pageX < window.innerWidth - 10) return;
+
+                // Prevent swipe to navigate gesture
+                e.preventDefault();
+            });
+        }
     },
     methods: {
         setupEventListeners() {
@@ -60,6 +73,7 @@ export default {
             document.addEventListener('touchstart', this.touchListener);
             document.addEventListener('touchend', this.touchListener);
             document.addEventListener('touchmove', this.touchListener);
+            
         },
         touchListener(event) {
 
@@ -173,7 +187,7 @@ export default {
             let turnOn = is.filter(i => was.indexOf(i) === -1)
             turnOff.forEach((item) => {
                 this.simulateKeyPress(item, false);
-                window.navigator.vibrate(200);
+                // window.navigator.vibrate(200);
             });
             turnOn.forEach((item) => this.simulateKeyPress(item, true));
         },
@@ -207,20 +221,64 @@ export default {
         },
         game: function() {
             return games[this.$route.params.game]
+        },
+        isFullscreenAvailable: function () {
+            return document.documentElement.requestFullscreen;
+        },
+        isIos() {
+            return [
+                'iPad Simulator',
+                'iPhone Simulator',
+                'iPod Simulator',
+                'iPad',
+                'iPhone',
+                'iPod'
+            ].includes(navigator.platform)
+            // iPad on iOS 13 detection
+            || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
         }
     }
 }
 </script>
 
-<style scoped>
-    #axCanvas {
-        background-color: #110000;
-        height: 85vh;
-        width: 136vh;
+<style>
+    * {
+        -webkit-user-select: none; /* disable selection/Copy of UIWebView */
+        -webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
     }
 
-    *:not(input):not(textarea) {
-      -webkit-user-select: none; /* disable selection/Copy of UIWebView */
-      -webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
+    body {
+        position: fixed;
+        height:100%;
+        width:100%;
+        overflow: hidden;
+    
     }
+
+    #gameScreen {
+        background-color: rgb(54, 34, 34);
+        touch-action: manipulation;
+    }
+
+    #axCanvas {
+        background-color: #110000;
+        /* height: 70vh; */
+        /* width: 116vh; */
+        width: 70vw;
+        height: calc(70vw / 1.7);
+    }
+
+    #axMiddleColumn {
+        display: flex;
+        justify-content: center;
+        align-items:center;
+        background-color: rgb(15, 15, 15);
+        height: 100%;
+        width: 100%;
+    }
+/*
+    *:not(input):not(textarea) {
+    }
+    -->
+    */
 </style>
