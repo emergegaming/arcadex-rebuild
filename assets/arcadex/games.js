@@ -1,3 +1,5 @@
+import {digger_digits} from "assets/arcadex/digits.js";
+
 export const games = {
     "digger": {
         // Working nicely
@@ -14,10 +16,15 @@ export const games = {
             'ctlButtonA':{ascii:112, label:'Fire'},
             'ctlButtonB':{ascii:32, label:'Start'}
         },
-        connection: {
-            endpoint:'http://localhost:8080/api/dos-games/receive-screenshot',
-            socket: false,
-            interval: 5000
+        ocrScore: {
+            scoreX: 12,
+            scoreY: 0,
+            interval: 1000,
+            charWidth: 10,
+            charHeight: 12,
+            charSpacing: 2,
+            numChars: 5,
+            referenceChars: digger_digits
         }
     },
     "pac-man": {

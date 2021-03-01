@@ -1,6 +1,5 @@
 <template>
     <div ref="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center bg-black">
-
         <!-- Left Column (Directional Control) -->
         <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
             <div class="w-32 h-32 bg-blue-800 rounded-full pointer-events-none flex justify-center items-center">
@@ -9,7 +8,7 @@
         </div>
 
         <!-- Middle Column (Canvas) -->
-        <div class="flex items-center justify-center">
+        <div class="flex items-center justify-center text-white">
             <canvas id="axCanvas" ref="axCanvas"/>
         </div>
 
@@ -34,6 +33,7 @@
 <script>
 
 import {games} from "assets/arcadex/games.js";
+import {setupOcr, processScreenshot} from "assets/arcadex/ocr2.js";
 
 export default {
     name: "game.vue",
@@ -49,6 +49,17 @@ export default {
         }
     },
     mounted() {
+        if (this.game.ocrScore) {
+            let startX = this.game.ocrScore.scoreX
+            let startY = this.game.ocrScore.scoreY
+            let charWidth = this.game.ocrScore.charWidth
+            let charHeight = this.game.ocrScore.charHeight
+            let charSpacing = this.game.ocrScore.charSpacing
+            let numChars = this.game.ocrScore.numChars;
+            let referenceChars = this.game.ocrScore.referenceChars;
+            setupOcr(startX, startY, charWidth, charHeight, charSpacing, numChars, referenceChars);
+        }
+
         this.runDosProgram(this.game.path, this.game.commands, this.game.cycles)
     },
     methods: {
@@ -179,17 +190,16 @@ export default {
         },
         dosReady() {
             this.setupEventListeners();
-            if (this.game.connection) {
+            if (this.game.ocrScore) {
                 this.setupScreenPoll()
             }
         },
         setupScreenPoll() {
             this.screenPoll = setInterval(() => {
-                ci.screenshot().then((data) => {
-                    console.log (data);
-                    //fetch(this.game.connection.endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({imageData:data})}).then(r => r.json()).then(data => console.log(data));
+                ci.screenshot().then((imageData) => {
+                    processScreenshot(imageData);
                 })
-            }, this.game.connection.interval)
+            }, this.game.ocrScore.interval)
         },
         runDosProgram (zipPath, commands, cycles) {
             console.log (zipPath, commands, cycles)
