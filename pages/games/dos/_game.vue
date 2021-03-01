@@ -1,5 +1,5 @@
 <template>
-    <div ref="gameScreen" class="flex flex-row w-full h-screen flex-grow items-center justify-center">
+    <div ref="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center bg-black">
 
         <!-- Left Column (Directional Control) -->
         <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
@@ -150,11 +150,11 @@ export default {
                 this.exitGame();
             }
             else {
-                //console.log (button, pressed, this.game.keyMapping[button]);
                 window.ci.simulateKeyEvent(this.game.keys[button].ascii, pressed)
             }
         },
         exitGame() {
+            window.clearInterval(this.screenPoll);
             window.ci.exit();
             this.$router.push('/')
         },
@@ -179,6 +179,17 @@ export default {
         },
         dosReady() {
             this.setupEventListeners();
+            if (this.game.connection) {
+                this.setupScreenPoll()
+            }
+        },
+        setupScreenPoll() {
+            this.screenPoll = setInterval(() => {
+                ci.screenshot().then((data) => {
+                    console.log (data);
+                    //fetch(this.game.connection.endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({imageData:data})}).then(r => r.json()).then(data => console.log(data));
+                })
+            }, this.game.connection.interval)
         },
         runDosProgram (zipPath, commands, cycles) {
             console.log (zipPath, commands, cycles)

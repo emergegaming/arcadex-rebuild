@@ -13,6 +13,11 @@ export const games = {
             'right':{ascii:39},
             'ctlButtonA':{ascii:112, label:'Fire'},
             'ctlButtonB':{ascii:32, label:'Start'}
+        },
+        connection: {
+            endpoint:'http://localhost:8080/api/dos-games/receive-screenshot',
+            socket: false,
+            interval: 5000
         }
     },
     "pac-man": {
