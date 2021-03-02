@@ -38,6 +38,9 @@ export default {
     },
     build: {
     },
+    generate: {
+        fallback:true
+    },
     server: {
         host: "0.0.0.0"
     }
