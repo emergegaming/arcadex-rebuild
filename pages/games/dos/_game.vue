@@ -265,7 +265,12 @@ export default {
     }
 
     *:not(input):not(textarea) {
-      -webkit-user-select: none; /* disable selection/Copy of UIWebView */
-      -webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
+
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        touch-action: none;
+        -webkit-text-size-adjust: none
+
     }
+    
 </style>
