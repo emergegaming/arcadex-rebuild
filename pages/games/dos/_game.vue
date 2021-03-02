@@ -1,33 +1,35 @@
 <template>
-    <div ref="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center bg-black">
-        <!-- Left Column (Directional Control) -->
-        <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
-            <div class="w-32 h-32 bg-blue-800 rounded-full pointer-events-none flex justify-center items-center">
-                <div class="bg-blue-700 rounded-full pointer-events-none w-10 h-10"></div>
+    <section class="relative">
+        <div class="fixed w-full h-full bg-black"></div>
+        <div id="background" class="fixed w-full h-full opacity-50 z-10"></div>
+        <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
+            <!-- Left Column (Directional Control) -->
+            <div class="flex flex-col items-center justify-center" v-if="isTouch">
+                <div class="relative flex w-32 h-32 items-center justify-center">
+                    <img class="absolute w-24 h-24" src="/images/dos-console/JoystickSurround.svg">
+                    <img class="absolute w-32 h-32" src="/images/dos-console/Joystick.svg">
+                </div>
             </div>
-        </div>
 
-        <!-- Middle Column (Canvas) -->
-        <div class="flex items-center justify-center text-white">
-            <canvas id="axCanvas" ref="axCanvas"/>
-        </div>
+            <!-- Middle Column (Canvas) -->
+            <div class="flex items-center justify-center text-white">
+                <canvas id="axCanvas" ref="axCanvas" class="p-2"/>
+            </div>
 
-        <!-- Right Column (Buttons) -->
-        <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-            <div id="ctlButtonFull" class="w-16 h-8 mb-5">
-                <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Full</div>
-            </div>
-            <div id="ctlButtonExit" class="w-16 h-8 mb-5">
-                <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Exit</div>
-            </div>
-            <div id="ctlButtonB" class="w-16 h-16 mb-5 mt-10" v-if="game.keys.ctlButtonB">
-                <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full flex items-center justify-center">{{game.keys.ctlButtonB.label}}</div>
-            </div>
-            <div id="ctlButtonA" class="w-16 h-16" v-if="game.keys.ctlButtonA">
-                <div class="bg-red-800 rounded-full pointer-events-none w-full h-full flex items-center justify-center">{{game.keys.ctlButtonA.label}}</div>
+            <!-- Right Column (Buttons) -->
+            <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
+                <div id="ctlButtonFull" class="w-16 h-8 mb-5 pointer-events-none">
+                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500">Full</div>
+                </div>
+                <div id="ctlButtonExit" class="w-16 h-8 mb-5 pointer-events-none">
+                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500">Exit</div>
+                </div>
+                <img id="ctlButtonA" src="/images/dos-console/BTN-A.svg" class="w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonA">
+                <img id="ctlButtonB" src="/images/dos-console/BTN-B.svg" class="w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonB">
+
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
@@ -234,11 +236,25 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+
+    #axKnob {
+
+    }
+
+    #axBase {
+
+    }
+
+    #background {
+        background-image:url('/images/dos-console/LeftPanel_wide.svg');
+        background-size: cover;
+    }
+
     #axCanvas {
         background-color: #110000;
-        height: 85vh;
-        width: 136vh;
+        height: calc((100vw - 220px) / 1.6);
+        width: calc(100vw - 220px);
     }
 
     *:not(input):not(textarea) {
