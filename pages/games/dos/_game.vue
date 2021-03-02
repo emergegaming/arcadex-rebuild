@@ -1,32 +1,33 @@
 <template>
-    <section class="relative">
+    <section class="relative pointer-events-none">
         <div class="fixed w-full h-full bg-black"></div>
-        <div id="background" class="fixed w-full h-full opacity-50 z-10"></div>
+        <div id="background" class="fixed w-full h-full opacity-50 z-10 bg-cover"></div>
         <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
             <!-- Left Column (Directional Control) -->
-            <div class="flex flex-col items-center justify-center" v-if="isTouch">
-                <div class="relative flex w-32 h-32 items-center justify-center">
-                    <img class="absolute w-24 h-24" src="/images/dos-console/JoystickSurround.svg">
-                    <img class="absolute w-32 h-32" src="/images/dos-console/Joystick.svg">
+            <div class="flex flex-col items-center justify-center pointer-events-none" v-if="isTouch">
+                <div class="relative flex w-32 h-32 items-center justify-center pointer-events-none">
+                    <img class="absolute w-24 h-24 pointer-events-none" src="/images/dos-console/JoystickSurround.svg">
+                    <img class="absolute w-32 h-32 pointer-events-none" src="/images/dos-console/Joystick.svg">
                 </div>
             </div>
 
             <!-- Middle Column (Canvas) -->
-            <div class="flex items-center justify-center text-white">
-                <canvas id="axCanvas" ref="axCanvas" class="p-2"/>
+            <div class="flex items-center justify-center text-white pointer-events-none">
+                <canvas id="axCanvas" ref="axCanvas" class="p-2 pointer-events-none bg-black"/>
             </div>
 
             <!-- Right Column (Buttons) -->
             <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-                <div id="ctlButtonFull" class="w-16 h-8 mb-5 pointer-events-none">
-                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500">Full</div>
+                <!-- @Frankie, I've put pointer-events-none on all the button objects and their children. This will help-->
+                <div id="ctlButtonFull" class="axControl w-16 h-8 mb-5 pointer-events-none">
+                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Full</div>
                 </div>
-                <div id="ctlButtonExit" class="w-16 h-8 mb-5 pointer-events-none">
-                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500">Exit</div>
+                <div id="ctlButtonExit" class="axControl w-16 h-8 mb-5 pointer-events-none">
+                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Exit</div>
                 </div>
-                <img id="ctlButtonA" src="/images/dos-console/BTN-A.svg" class="w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonA">
-                <img id="ctlButtonB" src="/images/dos-console/BTN-B.svg" class="w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonB">
-
+                <!--@Frankie, I just made these A and B as you suggested. Feels more arcade-like -->
+                <img id="ctlButtonA" src="/images/dos-console/BTN-A.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonA">
+                <img id="ctlButtonB" src="/images/dos-console/BTN-B.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonB">
             </div>
         </div>
     </section>
@@ -75,7 +76,6 @@ export default {
             document.addEventListener('touchmove', this.touchListener);
         },
         touchListener(event) {
-
             if (event.type === 'touchstart') {
                 event.changedTouches.forEach((starting) => {
                     if (starting.clientX < 200) {
@@ -83,11 +83,25 @@ export default {
                         this.directionStart.y = starting.clientY;
                         this.directionStart.identifier = starting.identifier;
                     } else {
-                        let id = document.elementFromPoint(starting.clientX, starting.clientY).getAttribute('id');
-                        if (id && id.startsWith("ctl")) {
-                            this.simulateKeyPress(id, true);
-                            this.buttonsPressed.push({identifier:starting.identifier, id:id, x:starting.clientX, y:starting.clientY});
-                        }
+                        let elem = document.elementFromPoint(starting.clientX, starting.clientY);
+
+                        /* @Frankie, I'm making EVERYTHING except the fixed gameScreen no touch.
+                        I'd rather have the gameScreen yes-touch than allow the touch to sink through to the
+                        document / body. I'm now manually comparing coordinates with rectangle boundaries
+                         */
+                        document.getElementsByClassName('axControl').forEach(elem => {
+                            let rect = elem.getBoundingClientRect();
+                            let x1 = rect.x, x2 = rect.x + rect.width, y1 = rect.y, y2 = rect.y + rect.height;
+                            if (starting.clientX > x1 && starting.clientX < x2 && starting.clientY > y1 && starting.clientY < y2) {
+                                if (elem.id && elem.id.startsWith("ctl")) {
+                                    this.simulateKeyPress(elem.id, true);
+                                    this.buttonsPressed.push({identifier:starting.identifier, id:elem.id, x:starting.clientX, y:starting.clientY});
+                                }
+
+                            }
+                        })
+
+
                     }
                 });
             } else if (event.type === 'touchend') {
@@ -150,9 +164,13 @@ export default {
                     }
                 });
             }
+
+            // @Frankie, this should cater for both your px margins around the border and all other touch events.
+            event.preventDefault()
+
         },
         simulateKeyPress(button, pressed) {
-            console.log (button, pressed)
+            //console.log (button, pressed)
             if (button === 'ctlButtonFull') {
                 if (!pressed) {
                     this.fullscreenPressed()
@@ -186,7 +204,7 @@ export default {
             let turnOn = is.filter(i => was.indexOf(i) === -1)
             turnOff.forEach((item) => {
                 this.simulateKeyPress(item, false);
-                window.navigator.vibrate(200);
+                // window.navigator.vibrate(200); // @Frankie disabled: very irritating
             });
             turnOn.forEach((item) => this.simulateKeyPress(item, true));
         },
@@ -200,7 +218,6 @@ export default {
             this.screenPoll = setInterval(() => {
                 ci.screenshot().then((imageData) => {
                     processScreenshot(imageData).then(score => console.log (score));
-
                 })
             }, this.game.ocrScore.interval)
         },
@@ -238,21 +255,11 @@ export default {
 
 <style>
 
-    #axKnob {
-
-    }
-
-    #axBase {
-
-    }
-
     #background {
         background-image:url('/images/dos-console/LeftPanel_wide.svg');
-        background-size: cover;
     }
 
     #axCanvas {
-        background-color: #110000;
         height: calc((100vw - 220px) / 1.6);
         width: calc(100vw - 220px);
     }
