@@ -39,7 +39,8 @@ export default {
     build: {
     },
     generate: {
-        fallback:true
+        fallback: true,
+        routes: ['/games/dos/digger','/games/dos/dangerous-dave','/games/dos/pac-man']
     },
     server: {
         host: "0.0.0.0"
