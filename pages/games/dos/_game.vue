@@ -2,27 +2,27 @@
     <div ref="gameScreen" id="gameScreen" class="flex flex-row w-full h-full flex-grow items-center justify-center">
         
         <!-- Left Column (Directional Control) -->
-        <div class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
-            <div class="w-32 h-32 bg-red-800 rounded-full pointer-events-none flex justify-center items-center">
-                <div class="bg-red-600 rounded-full pointer-events-none w-16 h-16"></div>
+        <div id="axLeftColumn" class="flex flex-grow flex-col items-center justify-center" v-if="isTouch">
+            <div id="logo"></div>
+            <div id="axJoystickContainer" class="bg-red-800 rounded-full pointer-events-none flex justify-center items-center">
+                <div id="axJoystick" class="bg-red-800 rounded-full pointer-events-none"></div>
             </div>
         </div>
 
         <!-- Middle Column (Canvas) -->
         <div id="axMiddleColumn">
-        <!-- <div class="flex items-center justify-center"> -->
             <canvas id="axCanvas" ref="axCanvas"/>
         </div>
 
         <!-- Right Column (Buttons) -->
         <div id="axRightColumn" class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-            <div id="ctlButtonFull" class="w-16 h-8 mb-5" v-if="isFullscreenAvailable">
+            <div id="ctlButtonFull" class="h-8 mb-5" v-if="isFullscreenAvailable">
                 <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Full</div>
             </div>
-            <div id="ctlButtonExit" class="w-16 h-8 mb-5">
+            <div id="ctlButtonExit" class="h-8 mb-5">
                 <div class="bg-gray-800 rounded-lg pointer-events-none w-full h-full flex items-center justify-center">Exit</div>
             </div>
-            <div id="ctlButtonB" class="w-16 h-16 mb-5 mt-10" v-if="game.keys.ctlButtonB">
+            <div id="ctlButtonB" class="w-16 h-16 mb-5" v-if="game.keys.ctlButtonB">
                 <div class="bg-gray-700 rounded-full pointer-events-none w-full h-full flex items-center justify-center">{{game.keys.ctlButtonB.label}}</div>
             </div>
             <div id="ctlButtonA" class="w-16 h-16" v-if="game.keys.ctlButtonA">
@@ -54,10 +54,28 @@ export default {
 
         // Prevent swiping to navigate browser on iOS only
         if (this.isIos) {
-            const element = document.getElementById('gameScreen');
-            element.addEventListener('touchstart', (e) => {
+            const gamescreen = document.getElementById('gameScreen');
+            gamescreen.addEventListener('touchstart', (e) => {
                 // Is not near edge of view, exit
-                if (e.pageX > 10 && e.pageX < window.innerWidth - 10) return;
+                if (e.pageX > 20 && e.pageX < window.innerWidth - 20) return;
+
+                // Prevent swipe to navigate gesture
+                e.preventDefault();
+            });
+
+            const leftcolumn = document.getElementById('axLeftColumn');
+            leftcolumn.addEventListener('touchstart', (e) => {
+                // Is not near edge of view, exit
+                if (e.pageX > 20 && e.pageX < window.innerWidth - 20) return;
+
+                // Prevent swipe to navigate gesture
+                e.preventDefault();
+            });
+
+            const joystickcontainer = document.getElementById('axJoystickContainer');
+            joystickcontainer.addEventListener('touchstart', (e) => {
+                // Is not near edge of view, exit
+                if (e.pageX > 20 && e.pageX < window.innerWidth - 20) return;
 
                 // Prevent swipe to navigate gesture
                 e.preventDefault();
@@ -86,6 +104,7 @@ export default {
                     } else {
                         let id = document.elementFromPoint(starting.clientX, starting.clientY).getAttribute('id');
                         if (id && id.startsWith("ctl")) {
+                            console.log(id);
                             this.simulateKeyPress(id, true);
                             this.buttonsPressed.push({identifier:starting.identifier, id:id, x:starting.clientX, y:starting.clientY});
                         }
@@ -110,6 +129,7 @@ export default {
                     }
                 })
             } else if (event.type === 'touchmove') {
+
                 event.changedTouches.forEach((moving) => {
                     if (moving.clientX < 200) {
                         let control = []
@@ -252,12 +272,15 @@ export default {
         height:100%;
         width:100%;
         overflow: hidden;
-    
     }
 
     #gameScreen {
-        background-color: rgb(54, 34, 34);
+        background-color: rgb(78, 54, 40);
         touch-action: manipulation;
+        background-image: url('../../../static/images/dos-console/wooddark.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: left top;
     }
 
     #axCanvas {
@@ -266,15 +289,78 @@ export default {
         /* width: 116vh; */
         width: 70vw;
         height: calc(70vw / 1.7);
+        border-radius: 4px;
+    }
+
+    #axLeftColumn {
+        pointer-events: none;
+        touch-action: manipulation;
+        height: 95%;
+        width: 32rem;
+    }
+
+    #logo {
+        width: 3rem;
+        height: 3rem;
+        background-image: url('../../../static/images/dos-console/logo.jpg');
+        background-size: 100% auto;
+        background-repeat: no-repeat;
+        background-position: left top;
+    }
+
+    #axJoystickContainer {
+        background-color: rgba(175, 175, 175, 0.3);
+        width: 7rem;
+        height: 7rem;
+        margin-left: 10px;
+        margin-top: 80px;
+    }
+
+    #axJoystick {
+        width: 3.5rem;
+        height: 3.5rem;
     }
 
     #axMiddleColumn {
         display: flex;
         justify-content: center;
         align-items:center;
-        background-color: rgb(15, 15, 15);
-        height: 100%;
+        height: 95%;
         width: 100%;
+        -moz-box-shadow:    inset 0px 2px 18px 6px rgba(0, 0, 0, 0.6);
+        -webkit-box-shadow: inset 0px 2px 18px 6px rgba(0, 0, 0, 0.6);
+        box-shadow:         inset 0px 2px 18px 6px rgba(0, 0, 0, 0.6);
+        border-radius: 6px;
+        background-color: rgb(26, 26, 26);
+        border: 3px solid gray;
+    }
+
+    #axRightColumn {
+        pointer-events: none;
+        touch-action: manipulation;
+        height: 100%;
+        width: 18rem;
+    }
+
+    #ctlButtonFull {
+        pointer-events: all;
+        width: 3rem;
+        font-size: 13px;
+    }
+
+    #ctlButtonExit {
+        pointer-events: all;
+        width: 3rem;
+        font-size: 13px;
+    }
+
+    #ctlButtonA {
+        pointer-events: all;
+    }
+
+    #ctlButtonB {
+        pointer-events: all;
+        margin-top: 40px;
     }
 /*
     *:not(input):not(textarea) {

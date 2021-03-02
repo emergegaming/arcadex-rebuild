@@ -36,15 +36,17 @@ export const games = {
         title:'Dangerous Dave',
         path: '/games/dos/dangerousdave.zip',
         commands: ['cd DANGER~1', 'DAVE.EXE'],
-        cycles:700,
+        cycles:3000,
         directions: 8,
         keys: {
             'up':{ascii:38},
             'down':{ascii:40},
             'left':{ascii:37},
             'right':{ascii:39},
-            'ctlButtonA':{ascii:17, label:'Fire'},
-            'ctlButtonB':{ascii:18, label:'Jet'},
+            'ctlButtonA':{ascii:17, label:'B'},
+            'ctlButtonB':{ascii:18, label:'A'},
+            // 'ctlButtonA':{ascii:17, label:'Fire'},
+            // 'ctlButtonB':{ascii:18, label:'Jet'}
         }
     },
 
