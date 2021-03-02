@@ -197,7 +197,8 @@ export default {
         setupScreenPoll() {
             this.screenPoll = setInterval(() => {
                 ci.screenshot().then((imageData) => {
-                    processScreenshot(imageData);
+                    processScreenshot(imageData).then(score => console.log (score));
+
                 })
             }, this.game.ocrScore.interval)
         },

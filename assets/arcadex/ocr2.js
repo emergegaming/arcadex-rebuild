@@ -17,27 +17,33 @@ export const setupOcr = (_startX, _startY, _charWidth, _charHeight, _charSpacing
 
 export const processScreenshot = (_imageData) => {
 
-    let stack = [];
-    let scoreChars = [];
-    let scoreString = '';
+    return new Promise((resolve, reject) => {
 
-    for (let charNo = 0; charNo < numChars; charNo++) {
-        stack.push(getImageSignature(_imageData, startX + (charNo * 12), startY, charWidth, charHeight).then((data) => {
-            scoreChars[charNo] = data;
-        }));
-    }
+        let stack = [];
+        let scoreChars = [];
+        let scoreString = '';
 
-    Promise.all(stack).then(() => {
-        scoreChars.forEach(scoreChar => {
-            for (let i = 0; i < 10; i++) {
-                if (scoreChar === charData[i]) {
-                    scoreString += i;
+        for (let charNo = 0; charNo < numChars; charNo++) {
+            stack.push(getImageSignature(_imageData, startX + (charNo * 12), startY, charWidth, charHeight).then((data) => {
+                scoreChars[charNo] = data;
+            }));
+        }
+
+        Promise.all(stack).then(() => {
+            scoreChars.forEach(scoreChar => {
+                for (let i = 0; i < 10; i++) {
+                    if (scoreChar === charData[i]) {
+                        scoreString += i;
+                    }
                 }
-            }
-        })
-        let numericScore = parseInt(scoreString, 10);
-        console.log (numericScore);
-    });
+            })
+            let numericScore = parseInt(scoreString, 10);
+            resolve(numericScore);
+        });
+
+
+    })
+
 }
 
 export const getImageSignature = (_imageData, sourceX, sourceY, width, height) => {
