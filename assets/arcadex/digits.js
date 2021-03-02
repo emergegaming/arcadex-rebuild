@@ -1,3 +1,4 @@
+// REFERENCE Digits 0-9 in an array as png data (configuration in games.js)
 export const digger_digits =
 [
 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAMCAYAAABbayygAAAALUlEQVQYlWNgYGD4H/r/P17MwMDwn4GQIrhiFF1Y8AAoJNqNg1EhEbFDXBQCAEh2LOJ21AlVAAAAAElFTkSuQmCC',

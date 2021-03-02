@@ -217,7 +217,9 @@ export default {
         setupScreenPoll() {
             this.screenPoll = setInterval(() => {
                 ci.screenshot().then((imageData) => {
-                    processScreenshot(imageData).then(score => console.log (score));
+                    processScreenshot(imageData).then(
+                        score => console.log (score) // RECEIVES OCR SCORE HERE
+                    );
                 })
             }, this.game.ocrScore.interval)
         },
@@ -272,5 +274,5 @@ export default {
         -webkit-text-size-adjust: none
 
     }
-    
+
 </style>
