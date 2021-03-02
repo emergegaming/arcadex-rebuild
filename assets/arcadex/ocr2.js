@@ -8,14 +8,11 @@ export const setupOcr = (_startX, _startY, _charWidth, _charHeight, _charSpacing
     charWidth = _charWidth;
     charHeight = _charHeight;
 
-    let stack = [];
-
     for (let charNo = 0; charNo < 10; charNo++) {
-        stack.push(getImageSignature(_referenceChars[charNo], 0, 0, _charWidth, _charHeight).then((data) => {
+        getImageSignature(_referenceChars[charNo], 0, 0, _charWidth, _charHeight).then((data) => {
             charData[charNo] = data;
-        }));
+        });
     }
-
 }
 
 export const processScreenshot = (_imageData) => {
@@ -43,10 +40,12 @@ export const processScreenshot = (_imageData) => {
     });
 }
 
-
 export const getImageSignature = (_imageData, sourceX, sourceY, width, height) => {
+
     return new Promise((resolve, reject) => {
+
         let i = new Image();
+
         i.onload = function() {
             let elem = document.createElement('canvas');
             let canvas = elem.getContext('2d');
@@ -55,6 +54,7 @@ export const getImageSignature = (_imageData, sourceX, sourceY, width, height) =
             canvas.drawImage(i, sourceX, sourceY, width, height, 0, 0, width, height);
             resolve (elem.toDataURL().substr(70));
         };
-        i.src = _imageData
+
+        i.src = _imageData;
     })
 }
