@@ -3,8 +3,13 @@
         <div class="fixed w-full h-full bg-black"></div>
         <div id="background" class="fixed w-full h-full opacity-50 z-10 bg-cover"></div>
         <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
+             <!-- Overlay to Show when orientation is portrait -->
+            <div class="orientation-notice">
+                <p>Please rotate the device to play</p>
+            </div>
+
             <!-- Left Column (Directional Control) -->
-            <div class="flex flex-col items-center justify-center pointer-events-none" v-if="isTouch">
+            <div class="flex flex-col flex-grow items-center justify-center pointer-events-none" v-if="isTouch">
                 <div class="relative flex w-32 h-32 items-center justify-center pointer-events-none">
                     <img class="absolute w-24 h-24 pointer-events-none" src="/images/dos-console/JoystickSurround.svg">
                     <img class="absolute w-32 h-32 pointer-events-none" src="/images/dos-console/Joystick.svg">
@@ -19,7 +24,7 @@
             <!-- Right Column (Buttons) -->
             <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
                 <!-- @Frankie, I've put pointer-events-none on all the button objects and their children. This will help-->
-                <div id="ctlButtonFull" class="axControl w-16 h-8 mb-5 pointer-events-none">
+                <div id="ctlButtonFull" class="axControl w-16 h-8 mt-5 mb-5 pointer-events-none">
                     <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Full</div>
                 </div>
                 <div id="ctlButtonExit" class="axControl w-16 h-8 mb-5 pointer-events-none">
@@ -256,23 +261,63 @@ export default {
 </script>
 
 <style>
+    *:not(input):not(textarea) {
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        touch-action: none;
+        -webkit-text-size-adjust: none
+    }
 
     #background {
         background-image:url('/images/dos-console/LeftPanel_wide.svg');
     }
 
     #axCanvas {
-        height: calc((100vw - 220px) / 1.6);
-        width: calc(100vw - 220px);
+        height: calc((100vw - 260px) / 1.6);
+        width: calc(100vw - 260px);
     }
 
-    *:not(input):not(textarea) {
+    .orientation-notice {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: #110000;
+        z-index: 2;
+    }
+        .orientation-notice p {
+            margin: 0;
+            color: #fff;
+        }
 
-        -webkit-user-select: none;
-        -webkit-touch-callout: none;
-        touch-action: none;
-        -webkit-text-size-adjust: none
-
+    @media screen and (orientation:portrait) {
+        .orientation-notice {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     }
 
+    @media only screen and (min-width: 1025px) {
+        #axCanvas {
+            height: calc((100vw - 360px) / 1.6);
+            width: calc(100vw - 360px);
+        }
+    }
+    
+    @media only screen and (min-width: 1200px) {
+        #axCanvas {
+            height: calc((100vw - 520px) / 1.6);
+            width: calc(100vw - 520px);
+        }
+    }
+
+    @media only screen and (min-width: 1400px) {
+        #axCanvas {
+            height: calc((100vw - 820px) / 1.6);
+            width: calc(100vw - 820px);
+        }
+    }
 </style>
