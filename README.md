@@ -7,7 +7,7 @@ There are 3 dos games installed. They are available at:
 
 ## To run the application locally
 
-* npm run dev - development mode with HMR (auto-reload)
+* `npm run dev` - development mode with HMR (auto-reload)
 
 or 
 
@@ -15,7 +15,7 @@ or
 2. `npm generate` - to generate static pages (games - required)
 3. `npm start` - to start the webpack / nuxt server
 
-Take the contents of the /dist folder for deployment.
+Take the contents of the `/dist` folder for static JAMStack deployment (recommended).
 
 ## Notes
  
@@ -71,6 +71,9 @@ Take the contents of the /dist folder for deployment.
 1. IOS Safari: No fullscreen
 2. IOS Safari: Cannot disable pinch and zoom
 3. Desktop: Widescreen makes canvas extend beyond the top and bottom of screen (RESOLVABLE)
-4  Desktop: Digger: Keyboard fire button is F1: F1 on Mac requires fn to be pressed. Another key should be mapped (RESOLVABLE)
+4. Desktop: Digger: Keyboard fire button is F1: F1 on Mac requires fn to be pressed. Another key should be mapped (RESOLVABLE)
+5. HTTP Referer is not restricted (RESOLVABLE)
+6. [CSP Frame Ancestors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors) has not been set up in the Netlify Headers!!! (RESOLVABLE)
+7. Unframed viewing is currently allowed. Related to 6 (RESOLVABLE)
    
 Cheers!
