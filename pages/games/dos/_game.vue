@@ -94,11 +94,6 @@ export default {
                         this.directionStart.identifier = starting.identifier;
                     } else {
                         let elem = document.elementFromPoint(starting.clientX, starting.clientY);
-
-                        /* @Frankie, I'm making EVERYTHING except the fixed gameScreen no touch.
-                        I'd rather have the gameScreen yes-touch than allow the touch to sink through to the
-                        document / body. I'm now manually comparing coordinates with rectangle boundaries
-                         */
                         document.getElementsByClassName('axControl').forEach(elem => {
                             let rect = elem.getBoundingClientRect();
                             let x1 = rect.x, x2 = rect.x + rect.width, y1 = rect.y, y2 = rect.y + rect.height;
@@ -107,7 +102,6 @@ export default {
                                     this.simulateKeyPress(elem.id, true);
                                     this.buttonsPressed.push({identifier:starting.identifier, id:elem.id, x:starting.clientX, y:starting.clientY});
                                 }
-
                             }
                         })
                     }
@@ -172,8 +166,6 @@ export default {
                     }
                 });
             }
-
-            // @Frankie, this should cater for both your px margins around the border and all other touch events.
             event.preventDefault()
 
         },
@@ -221,6 +213,9 @@ export default {
             if (this.game.ocrScore) {
                 this.setupScreenPoll()
             }
+            setTimeout(() => {
+                this.loading = false;
+            }, 750)
         },
         setupScreenPoll() {
             this.screenPoll = setInterval(() => {
