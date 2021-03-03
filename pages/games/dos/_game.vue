@@ -28,14 +28,15 @@
                 <img id="ctlButtonB" src="/images/dos-console/BTN-B.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonB">
             </div>
         </div>
+
         <!-- Overlay to: Show when loading -->
-        <div class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 border border-red-500 bg-black items-center justify-center z-30" v-if="loading">
-            <p class="text-white">Loading</p>
+        <div class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 border items-center justify-center z-30" v-if="loading" style="background-color: #101010">
+            <animation path="/animation/loading.json" style="width:640px; height:360px;"></animation>
         </div>
 
         <!-- Overlay to: Show when orientation is portrait -->
-        <div class="orientation-notice fixed hidden top-0 left-0 right-0 bottom-0 border border-red-500 bg-black items-center justify-center z-40">
-            <p class="text-white">Please rotate the device to play</p>
+        <div class="orientation-notice fixed hidden top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
+            <animation path="/animation/rotate-screen.json" style="width:640px; height:360px;"></animation>
         </div>
 
 
