@@ -3,11 +3,6 @@
         <div class="fixed w-full h-full bg-black"></div>
         <div id="background" class="fixed w-full h-full opacity-50 z-10 bg-cover"></div>
         <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
-             <!-- Overlay to Show when orientation is portrait -->
-            <div class="orientation-notice">
-                <p>Please rotate the device to play</p>
-            </div>
-
             <!-- Left Column (Directional Control) -->
             <div class="flex flex-col flex-grow items-center justify-center pointer-events-none" v-if="isTouch">
                 <div class="relative flex w-32 h-32 items-center justify-center pointer-events-none">
@@ -23,18 +18,27 @@
 
             <!-- Right Column (Buttons) -->
             <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-                <!-- @Frankie, I've put pointer-events-none on all the button objects and their children. This will help-->
                 <div id="ctlButtonFull" class="axControl w-16 h-8 mt-5 mb-5 pointer-events-none">
                     <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Full</div>
                 </div>
                 <div id="ctlButtonExit" class="axControl w-16 h-8 mb-5 pointer-events-none">
                     <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Exit</div>
                 </div>
-                <!--@Frankie, I just made these A and B as you suggested. Feels more arcade-like -->
                 <img id="ctlButtonA" src="/images/dos-console/BTN-A.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonA">
                 <img id="ctlButtonB" src="/images/dos-console/BTN-B.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonB">
             </div>
         </div>
+        <!-- Overlay to: Show when loading -->
+        <div class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 border border-red-500 bg-black items-center justify-center z-30" v-if="loading">
+            <p class="text-white">Loading</p>
+        </div>
+
+        <!-- Overlay to: Show when orientation is portrait -->
+        <div class="orientation-notice fixed hidden top-0 left-0 right-0 bottom-0 border border-red-500 bg-black items-center justify-center z-40">
+            <p class="text-white">Please rotate the device to play</p>
+        </div>
+
+
     </section>
 </template>
 
@@ -54,6 +58,7 @@ export default {
             },
             lastDirection: [],
             buttonsPressed: [],
+            loading: true
         }
     },
     mounted() {
@@ -105,8 +110,6 @@ export default {
 
                             }
                         })
-
-
                     }
                 });
             } else if (event.type === 'touchend') {
@@ -278,25 +281,12 @@ export default {
     }
 
     .orientation-notice {
-        display: none;
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
         background: #110000;
-        z-index: 2;
     }
-        .orientation-notice p {
-            margin: 0;
-            color: #fff;
-        }
 
     @media screen and (orientation:portrait) {
         .orientation-notice {
             display: flex;
-            justify-content: center;
-            align-items: center;
         }
     }
 
@@ -306,7 +296,7 @@ export default {
             width: calc(100vw - 360px);
         }
     }
-    
+
     @media only screen and (min-width: 1200px) {
         #axCanvas {
             height: calc((100vw - 520px) / 1.6);
