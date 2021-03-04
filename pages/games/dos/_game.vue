@@ -1,5 +1,5 @@
 <template>
-    <section class="relative pointer-events-none">
+    <section ref="screen" class="relative pointer-events-none">
         <div class="fixed w-full h-full bg-black"></div>
         <div id="background" class="fixed w-full h-full opacity-50 z-10 bg-cover"></div>
         <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
@@ -30,7 +30,7 @@
         </div>
 
         <!-- Overlay to: Show when loading -->
-        <div class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 border items-center justify-center z-30" v-if="loading" style="background-color: #101010">
+        <div class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-30" v-if="loading" style="background-color: #101010">
             <animation path="/animation/loading.json" style="width:640px; height:360px;"></animation>
         </div>
 
@@ -59,7 +59,10 @@ export default {
             },
             lastDirection: [],
             buttonsPressed: [],
-            loading: true
+            loading: true,
+            lastScore: NaN,
+            score: NaN,
+            lastPulse: NaN
         }
     },
     mounted() {
@@ -77,14 +80,27 @@ export default {
         this.runDosProgram(this.game.path, this.game.commands, this.game.cycles)
     },
     methods: {
-        setupEventListeners() {
+        // Event Listeners
+        // Keycodes (block)
+        // Not all games.
+        // If NAN space enabled else not
+        removeEventListeners() {
             document.removeEventListener('touchstart', this.touchListener, false);
             document.removeEventListener('touchend', this.touchListener, false);
             document.removeEventListener('touchmove', this.touchListener, false);
-
+            window.removeEventListener('beforeunload', this.exitGame)
+            //window.removeEventListener('keydown', this.handleKey)
+            //window.removeEventListener('keyup', this.handleKey)
+        },
+        setupEventListeners() {
+            this.removeEventListeners();
             document.addEventListener('touchstart', this.touchListener);
             document.addEventListener('touchend', this.touchListener);
             document.addEventListener('touchmove', this.touchListener);
+            window.addEventListener('beforeunload', this.exitGame)
+            //window.addEventListener('keydown', this.handleKey)
+            //window.addEventListener('keyup', this.handleKey)
+
         },
         touchListener(event) {
             if (event.type === 'touchstart') {
@@ -170,8 +186,17 @@ export default {
             event.preventDefault()
 
         },
+        // handleKey(event) {
+        //     if (event.key && event.key === ' ' || !event.key && event.keyCode === 32) {
+        //         if (!isNaN(this.score)) {
+        //             return
+        //         } else {
+        //             this.simulateKeyPress('ctlButtonA', event.type === 'keydown');
+        //         }
+        //     }
+        //     console.log (`type: ${event.type}, score: ${this.score}`);
+        // },
         simulateKeyPress(button, pressed) {
-            //console.log (button, pressed)
             if (button === 'ctlButtonFull') {
                 if (!pressed) {
                     this.fullscreenPressed()
@@ -180,21 +205,23 @@ export default {
             } else if (button === 'ctlButtonExit') {
                 console.log('Exit Button Pressed');
                 this.exitGame();
+                this.$router.push('/')
             }
             else {
                 window.ci.simulateKeyEvent(this.game.keys[button].ascii, pressed)
             }
         },
         exitGame() {
-            window.clearInterval(this.screenPoll);
+            this.removeEventListeners();
+            clearInterval(this.watchPulse);
+            clearInterval(this.screenPoll);
             window.ci.exit();
-            this.$router.push('/')
         },
         fullscreenPressed() {
             if (document.fullscreenElement) {
                 document.exitFullscreen()
             } else {
-                this.$refs.gameScreen.requestFullscreen()
+                this.$refs.screen.requestFullscreen()
             }
         },
         radToDeg(rad) {
@@ -205,12 +232,11 @@ export default {
             let turnOn = is.filter(i => was.indexOf(i) === -1)
             turnOff.forEach((item) => {
                 this.simulateKeyPress(item, false);
-                // window.navigator.vibrate(200); // @Frankie disabled: very irritating
             });
             turnOn.forEach((item) => this.simulateKeyPress(item, true));
         },
         dosReady() {
-            this.setupEventListeners();
+            if (this.isTouch) this.setupEventListeners();
             if (this.game.ocrScore) {
                 this.setupScreenPoll()
             }
@@ -218,11 +244,30 @@ export default {
                 this.loading = false;
             }, 750)
         },
+        checkPulse() {
+            if (!isNaN(this.lastPulse) && Date.now() - this.lastPulse > 2000) {
+                this.endGame(this.lastScore);
+
+            }
+        },
         setupScreenPoll() {
+            this.watchPulse = setInterval(this.checkPulse, 500);
             this.screenPoll = setInterval(() => {
                 ci.screenshot().then((imageData) => {
                     processScreenshot(imageData).then(
-                        score => console.log (score) // RECEIVES OCR SCORE HERE
+                        score => {
+                            this.lastPulse = Date.now();
+                            console.log(score);
+                            this.score = score;
+                            if (this.score !== this.lastScore) {
+                                if (isNaN(this.lastScore) && !isNaN(this.score)) {
+                                    console.log ("Game Started. Score: " + score)
+                                } else if (!isNaN(this.lastScore) && isNaN(this.score)) {
+                                    this.endGame(this.lastScore);
+                                }
+                                this.lastScore = score;
+                            }
+                        }
                     );
                 })
             }, this.game.ocrScore.interval)
@@ -244,6 +289,13 @@ export default {
                     )
                 )
             });
+        },
+        endGame(score) {
+            console.log ('Ending game with score ' + score);
+            this.exitGame();
+
+            //@
+            setTimeout(() => window.location.href = window.location, 2000);
         }
     },
     computed: {
