@@ -39,7 +39,6 @@
             <animation path="/animation/rotate-screen.json" style="width:640px; height:360px;"></animation>
         </div>
 
-
     </section>
 </template>
 
@@ -62,45 +61,82 @@ export default {
             loading: true,
             lastScore: NaN,
             score: NaN,
-            lastPulse: NaN
+            lastPulse: NaN,
+            currentKey: null
         }
     },
     mounted() {
-        if (this.game.ocrScore) {
-            let startX = this.game.ocrScore.scoreX
-            let startY = this.game.ocrScore.scoreY
-            let charWidth = this.game.ocrScore.charWidth
-            let charHeight = this.game.ocrScore.charHeight
-            let charSpacing = this.game.ocrScore.charSpacing
-            let numChars = this.game.ocrScore.numChars;
-            let referenceChars = this.game.ocrScore.referenceChars;
-            setupOcr(startX, startY, charWidth, charHeight, charSpacing, numChars, referenceChars);
-        }
-
-        this.runDosProgram(this.game.path, this.game.commands, this.game.cycles)
+        this.start();
     },
     methods: {
-        // Event Listeners
-        // Keycodes (block)
-        // Not all games.
-        // If NAN space enabled else not
+        handleKey(event) {
+            console.log ("press")
+            if (event.keyCode in this.game.remapKeys) {
+                if (event.type === 'keyup' && this.currentKey !== null) {
+                    console.log ('SPACE RELEASED')
+                    if (this.ci) this.ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], false)
+                    this.currentKey = null;
+                } else if (event.type === 'keydown' && event.keyCode !== this.currentKey) {
+                    console.log ('SPACE PRESSED')
+                    if (this.ci) this.ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], true)
+                    console.log (this.game.remapKeys[event.keyCode]);
+                    this.currentKey = event.keyCode;
+                }
+                event.preventDefault();
+            }
+        },
+        start() {
+            this.directionStart = {
+                x: null,
+                y: null,
+                identifier: null
+            }
+            this.lastDirection = [];
+            this.buttonsPressed = [];
+            this.loading = true;
+            this.lastScore = NaN;
+            this.score = NaN;
+            this.lastPulse = NaN;
+            this.currentKey = null;
+
+            if (this.game.ocrScore) {
+                let startX = this.game.ocrScore.scoreX
+                let startY = this.game.ocrScore.scoreY
+                let charWidth = this.game.ocrScore.charWidth
+                let charHeight = this.game.ocrScore.charHeight
+                let charSpacing = this.game.ocrScore.charSpacing
+                let numChars = this.game.ocrScore.numChars;
+                let referenceChars = this.game.ocrScore.referenceChars;
+                setupOcr(startX, startY, charWidth, charHeight, charSpacing, numChars, referenceChars);
+            }
+
+            this.runDosProgram(this.game.path, this.game.commands, this.game.cycles)
+        },
         removeEventListeners() {
             document.removeEventListener('touchstart', this.touchListener, false);
             document.removeEventListener('touchend', this.touchListener, false);
             document.removeEventListener('touchmove', this.touchListener, false);
             window.removeEventListener('beforeunload', this.exitGame)
-            //window.removeEventListener('keydown', this.handleKey)
-            //window.removeEventListener('keyup', this.handleKey)
+            window.removeEventListener('keydown', this.handleKey)
+            window.removeEventListener('keyup', this.handleKey)
         },
-        setupEventListeners() {
+        setupTouchEventListeners() {
             this.removeEventListeners();
             document.addEventListener('touchstart', this.touchListener);
             document.addEventListener('touchend', this.touchListener);
             document.addEventListener('touchmove', this.touchListener);
             window.addEventListener('beforeunload', this.exitGame)
-            //window.addEventListener('keydown', this.handleKey)
-            //window.addEventListener('keyup', this.handleKey)
-
+        },
+        setupKeyboardEventListeners() {
+            if (this.game.remapKeys) document.addEventListener('keydown', this.thing);
+            if (this.game.remapKeys) document.addEventListener('keyup', this.thing);
+        },
+        thing(event) {
+            if (event.keyCode in this.game.remapKeys) {
+                event.stopImmediatePropagation();
+                event.preventDefault();
+                ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], event.type === 'keydown');
+            }
         },
         touchListener(event) {
             if (event.type === 'touchstart') {
@@ -186,24 +222,14 @@ export default {
             event.preventDefault()
 
         },
-        // handleKey(event) {
-        //     if (event.key && event.key === ' ' || !event.key && event.keyCode === 32) {
-        //         if (!isNaN(this.score)) {
-        //             return
-        //         } else {
-        //             this.simulateKeyPress('ctlButtonA', event.type === 'keydown');
-        //         }
-        //     }
-        //     console.log (`type: ${event.type}, score: ${this.score}`);
-        // },
         simulateKeyPress(button, pressed) {
             if (button === 'ctlButtonFull') {
                 if (!pressed) {
                     this.fullscreenPressed()
-                    console.log('Full Screen Button Pressed');
+                    console.warn('Full Screen Button Pressed');
                 }
             } else if (button === 'ctlButtonExit') {
-                console.log('Exit Button Pressed');
+                console.warn('Exit Button Pressed');
                 this.exitGame();
                 this.$router.push('/')
             }
@@ -236,7 +262,8 @@ export default {
             turnOn.forEach((item) => this.simulateKeyPress(item, true));
         },
         dosReady() {
-            if (this.isTouch) this.setupEventListeners();
+            if (this.isTouch) this.setupTouchEventListeners();
+            this.setupKeyboardEventListeners();
             if (this.game.ocrScore) {
                 this.setupScreenPoll()
             }
@@ -245,8 +272,9 @@ export default {
             }, 750)
         },
         checkPulse() {
-            if (!isNaN(this.lastPulse) && Date.now() - this.lastPulse > 2000) {
-                this.endGame(this.lastScore);
+            if (!isNaN(this.lastPulse) && Date.now() - this.lastPulse > 5000) {
+                console.log ("PULSE ENDED")
+                //this.endGame(this.lastScore);
 
             }
         },
@@ -293,9 +321,8 @@ export default {
         endGame(score) {
             console.log ('Ending game with score ' + score);
             this.exitGame();
-
-            //@
-            setTimeout(() => window.location.href = window.location, 2000);
+            console.log ('Restarting...')
+            setTimeout(() => this.start(), 1500);
         }
     },
     computed: {

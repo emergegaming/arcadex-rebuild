@@ -14,7 +14,10 @@ export const games = {
             'left':{ascii:37},
             'right':{ascii:39},
             'ctlButtonA':{ascii:112, label:'Fire'},
-            'ctlButtonB':{ascii:32, label:'Start'}
+            'ctlButtonB':{ascii:13, label:'Start'}
+        },
+        remapKeys: {
+            32 : 112
         },
         ocrScore: {
             scoreX: 12,
