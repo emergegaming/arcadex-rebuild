@@ -45,6 +45,7 @@
 <script>
 
 import {games} from "assets/arcadex/games.js";
+import { emergeGamingSDK } from "assets/arcadex/emergamingSDK.js";
 import {setupOcr, processScreenshot} from "assets/arcadex/ocr2.js";
 
 export default {
@@ -289,6 +290,7 @@ export default {
                             this.score = score;
                             if (this.score !== this.lastScore) {
                                 if (isNaN(this.lastScore) && !isNaN(this.score)) {
+                                    emergeGamingSDK.startLevel();
                                     console.log ("Game Started. Score: " + score)
                                 } else if (!isNaN(this.lastScore) && isNaN(this.score)) {
                                     this.endGame(this.lastScore);
@@ -319,6 +321,7 @@ export default {
             });
         },
         endGame(score) {
+            emergeGamingSDK.endLevel(score);
             console.log ('Ending game with score ' + score);
             this.exitGame();
             console.log ('Restarting...')
