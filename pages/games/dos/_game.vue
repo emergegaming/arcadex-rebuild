@@ -1,5 +1,5 @@
 <template>
-    <section ref="screen" class="relative pointer-events-none">
+    <section ref="screen" class="relative">
         <div class="fixed w-full h-full bg-black"></div>
         <div id="background" class="fixed w-full h-full opacity-50 z-10 bg-cover"></div>
         <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
@@ -28,8 +28,13 @@
             <animation path="/animation/loading.json" style="width:640px; height:360px;"></animation>
         </div>
 
+        <!-- Overlay to: Load and Start -->
+        <div class="flex fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010" v-if="!started">
+            <button class="text-white border border-white p-2 rounded-lg bg-red-900 cursor-pointer z-40" @click="start()">Load & Start!</button>
+        </div>
+
         <!-- Overlay to: Show when orientation is portrait -->
-        <div class="orientation-notice fixed hidden top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
+        <div class="orientation-notice fixed hidden top-0 left-0 right-0 bottom-0 items-center justify-center z-50 pointer-events-none" style="background-color: #101010">
             <animation path="/animation/rotate-screen.json" style="width:640px; height:360px;"></animation>
         </div>
 
@@ -53,29 +58,21 @@ export default {
             },
             lastDirection: [],
             buttonsPressed: [],
-            loading: true,
+            loading: false,
+            started: false,
             lastScore: NaN,
             score: NaN,
             currentKey: null
         }
     },
-    mounted() {
-        this.start();
-    },
     methods: {
-        handleKey(event) {
-            if (event.keyCode in this.game.remapKeys) {
-                if (event.type === 'keyup' && this.currentKey !== null) {
-                    if (this.ci) this.ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], false)
-                    this.currentKey = null;
-                } else if (event.type === 'keydown' && event.keyCode !== this.currentKey) {
-                    if (this.ci) this.ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], true)
-                    this.currentKey = event.keyCode;
-                }
-                event.preventDefault();
-            }
+        sayHi() {
+            console.log('hi')
         },
         start() {
+            console.log ("starting")
+            this.started = true;
+            this.loading = true;
             if (this.game.ocrScore) {
                 let startX = this.game.ocrScore.scoreX
                 let startY = this.game.ocrScore.scoreY
@@ -93,7 +90,7 @@ export default {
             document.removeEventListener('touchstart', this.touchListener, false);
             document.removeEventListener('touchend', this.touchListener, false);
             document.removeEventListener('touchmove', this.touchListener, false);
-            window.removeEventListener('beforeunload', this.exitGame)
+            window.removeEventListener('beforeunload', this.unload);
             window.removeEventListener('keydown', this.keyMapping)
             window.removeEventListener('keyup', this.keyMapping)
         },
@@ -102,7 +99,7 @@ export default {
             document.addEventListener('touchstart', this.touchListener);
             document.addEventListener('touchend', this.touchListener);
             document.addEventListener('touchmove', this.touchListener);
-            //window.addEventListener('beforeunload', this.exitGame)
+            window.addEventListener('beforeunload', this.unload)
         },
         setupKeyboardEventListeners() {
             if (this.game.remapKeys) document.addEventListener('keydown', this.keyMapping);
@@ -283,6 +280,9 @@ export default {
             this.removeEventListeners();
             window.ci.exit()
             setTimeout(() => window.location.reload(), 2500);
+        },
+        unload() {
+            window.ci.exit();
         }
     },
     computed: {
