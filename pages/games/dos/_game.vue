@@ -229,7 +229,6 @@ export default {
                     this.screenshot = 'sent';
                 } else {
                     this.screenshotsMissed++;
-                    console.log("Screenshot Missed: " + this.screenshotsMissed)
                     if (this.screenshotsMissed > 4) {
                         clearInterval(this.screenPoll);
                         this.endGame(this.lastScore);
