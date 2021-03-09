@@ -51,7 +51,7 @@ export const games = {
         title:'Dangerous Dave',
         path: '/games/dos/dangerousdave.zip',
         commands: ['cd DANGER~1', 'DAVE.EXE'],
-        cycles:700,
+        cycles:2000,
         directions: 8,
         keys: {
             'up':{ascii:38},

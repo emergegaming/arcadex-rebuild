@@ -117,8 +117,8 @@ export default {
             document.removeEventListener('touchend', this.touchListener, false);
             document.removeEventListener('touchmove', this.touchListener, false);
             window.removeEventListener('beforeunload', this.exitGame)
-            window.removeEventListener('keydown', this.handleKey)
-            window.removeEventListener('keyup', this.handleKey)
+            window.removeEventListener('keydown', this.keyMapping)
+            window.removeEventListener('keyup', this.keyMapping)
         },
         setupTouchEventListeners() {
             this.removeEventListeners();
@@ -128,10 +128,10 @@ export default {
             window.addEventListener('beforeunload', this.exitGame)
         },
         setupKeyboardEventListeners() {
-            if (this.game.remapKeys) document.addEventListener('keydown', this.thing);
-            if (this.game.remapKeys) document.addEventListener('keyup', this.thing);
+            if (this.game.remapKeys) document.addEventListener('keydown', this.keyMapping);
+            if (this.game.remapKeys) document.addEventListener('keyup', this.keyMapping);
         },
-        thing(event) {
+        keyMapping(event) {
             if (event.keyCode in this.game.remapKeys) {
                 event.stopImmediatePropagation();
                 event.preventDefault();
@@ -238,10 +238,11 @@ export default {
             }
         },
         exitGame() {
+            window.ci.exit();
             this.removeEventListeners();
             clearInterval(this.watchPulse);
             clearInterval(this.screenPoll);
-            window.ci.exit();
+
         },
         fullscreenPressed() {
             if (document.fullscreenElement) {
@@ -274,7 +275,7 @@ export default {
         checkPulse() {
             if (!isNaN(this.lastPulse) && Date.now() - this.lastPulse > 5000) {
                 console.log ("PULSE ENDED")
-                //this.endGame(this.lastScore);
+                this.endGame(this.lastScore);
 
             }
         },
@@ -285,7 +286,6 @@ export default {
                     processScreenshot(imageData).then(
                         score => {
                             this.lastPulse = Date.now();
-                            console.log(score);
                             this.score = score;
                             if (this.score !== this.lastScore) {
                                 if (isNaN(this.lastScore) && !isNaN(this.score)) {
@@ -301,7 +301,6 @@ export default {
             }, this.game.ocrScore.interval)
         },
         runDosProgram (zipPath, commands, cycles) {
-            console.log (zipPath, commands, cycles)
             let self = this;
             Dos(this.$refs.axCanvas, {
                 wdosboxUrl: '/js/vendor/dosbox/wdosbox.js',
