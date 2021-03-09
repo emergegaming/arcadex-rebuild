@@ -18,12 +18,6 @@
 
             <!-- Right Column (Buttons) -->
             <div class="flex flex-col flex-grow items-center justify-center" v-if="isTouch">
-                <div id="ctlButtonFull" class="axControl w-16 h-8 mt-5 mb-5 pointer-events-none">
-                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Full</div>
-                </div>
-                <div id="ctlButtonExit" class="axControl w-16 h-8 mb-5 pointer-events-none">
-                    <div class="bg-black rounded-lg pointer-events-none w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">Exit</div>
-                </div>
                 <img id="ctlButtonA" src="/images/dos-console/BTN-A.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonA">
                 <img id="ctlButtonB" src="/images/dos-console/BTN-B.svg" class="axControl w-24 h-24 pointer-events-none" v-if="game.keys.ctlButtonB">
             </div>
@@ -62,7 +56,6 @@ export default {
             loading: true,
             lastScore: NaN,
             score: NaN,
-            lastPulse: NaN,
             currentKey: null
         }
     },
@@ -71,35 +64,18 @@ export default {
     },
     methods: {
         handleKey(event) {
-            console.log ("press")
             if (event.keyCode in this.game.remapKeys) {
                 if (event.type === 'keyup' && this.currentKey !== null) {
-                    console.log ('SPACE RELEASED')
                     if (this.ci) this.ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], false)
                     this.currentKey = null;
                 } else if (event.type === 'keydown' && event.keyCode !== this.currentKey) {
-                    console.log ('SPACE PRESSED')
                     if (this.ci) this.ci.simulateKeyEvent(this.game.remapKeys[event.keyCode], true)
-                    console.log (this.game.remapKeys[event.keyCode]);
                     this.currentKey = event.keyCode;
                 }
                 event.preventDefault();
             }
         },
         start() {
-            this.directionStart = {
-                x: null,
-                y: null,
-                identifier: null
-            }
-            this.lastDirection = [];
-            this.buttonsPressed = [];
-            this.loading = true;
-            this.lastScore = NaN;
-            this.score = NaN;
-            this.lastPulse = NaN;
-            this.currentKey = null;
-
             if (this.game.ocrScore) {
                 let startX = this.game.ocrScore.scoreX
                 let startY = this.game.ocrScore.scoreY
@@ -126,7 +102,7 @@ export default {
             document.addEventListener('touchstart', this.touchListener);
             document.addEventListener('touchend', this.touchListener);
             document.addEventListener('touchmove', this.touchListener);
-            window.addEventListener('beforeunload', this.exitGame)
+            //window.addEventListener('beforeunload', this.exitGame)
         },
         setupKeyboardEventListeners() {
             if (this.game.remapKeys) document.addEventListener('keydown', this.keyMapping);
@@ -224,33 +200,7 @@ export default {
 
         },
         simulateKeyPress(button, pressed) {
-            if (button === 'ctlButtonFull') {
-                if (!pressed) {
-                    this.fullscreenPressed()
-                    console.warn('Full Screen Button Pressed');
-                }
-            } else if (button === 'ctlButtonExit') {
-                console.warn('Exit Button Pressed');
-                this.exitGame();
-                this.$router.push('/')
-            }
-            else {
-                window.ci.simulateKeyEvent(this.game.keys[button].ascii, pressed)
-            }
-        },
-        exitGame() {
-            window.ci.exit();
-            this.removeEventListeners();
-            clearInterval(this.watchPulse);
-            clearInterval(this.screenPoll);
-
-        },
-        fullscreenPressed() {
-            if (document.fullscreenElement) {
-                document.exitFullscreen()
-            } else {
-                this.$refs.screen.requestFullscreen()
-            }
+            window.ci.simulateKeyEvent(this.game.keys[button].ascii, pressed)
         },
         radToDeg(rad) {
             return Math.round(rad * 180 / Math.PI);
@@ -273,27 +223,35 @@ export default {
                 this.loading = false;
             }, 750)
         },
-        checkPulse() {
-            if (!isNaN(this.lastPulse) && Date.now() - this.lastPulse > 5000) {
-                console.log ("PULSE ENDED")
-                this.endGame(this.lastScore);
 
-            }
-        },
         setupScreenPoll() {
-            this.watchPulse = setInterval(this.checkPulse, 500);
+            this.screenshot = null;
+            this.screenshotsMissed = 0;
             this.screenPoll = setInterval(() => {
+                if (this.screenshot == null || this.screenshot === 'received') {
+                    this.screenshot = 'sent';
+                } else {
+                    this.screenshotsMissed++;
+                    console.log("Screenshot Missed: " + this.screenshotsMissed)
+                    if (this.screenshotsMissed > 4) {
+                        this.endGame(this.lastScore);
+                    }
+                }
+
                 ci.screenshot().then((imageData) => {
+                    this.screenshot = 'received';
+                    this.screenshotsMissed = 0;
                     processScreenshot(imageData).then(
                         score => {
-                            this.lastPulse = Date.now();
                             this.score = score;
                             if (this.score !== this.lastScore) {
                                 if (isNaN(this.lastScore) && !isNaN(this.score)) {
                                     emergeGamingSDK.startLevel();
                                     console.log ("Game Started. Score: " + score)
                                 } else if (!isNaN(this.lastScore) && isNaN(this.score)) {
-                                    this.endGame(this.lastScore);
+                                    console.log (imageData)
+                                    console.log ("Game Ended. Score: " + this.lastScore)
+                                    emergeGamingSDK.endLevel(this.lastScore);
                                 }
                                 this.lastScore = score;
                             }
@@ -320,11 +278,11 @@ export default {
             });
         },
         endGame(score) {
-            emergeGamingSDK.endLevel(score);
             console.log ('Ending game with score ' + score);
-            this.exitGame();
-            console.log ('Restarting...')
-            setTimeout(() => this.start(), 1500);
+            emergeGamingSDK.endLevel(score);
+            this.removeEventListeners();
+            window.ci.exit()
+            setTimeout(() => window.location.reload(), 2500);
         }
     },
     computed: {
